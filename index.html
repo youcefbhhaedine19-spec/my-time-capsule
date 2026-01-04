@@ -17,15 +17,13 @@
             transition: background 0.5s ease;
         }
 
-        /* تنسيق اللوجو */
-        .logo-container {
-            margin-bottom: 10px;
-            animation: float 3s ease-in-out infinite;
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(white, transparent 2%);
+            background-size: 50px 50px; animation: moveStars 120s linear infinite;
+            z-index: -1; opacity: 0.2;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
+        @keyframes moveStars { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
 
         .toolbar {
             position: absolute; top: 20px; width: 90%;
@@ -35,7 +33,7 @@
         #langSelect {
             background: rgba(0, 0, 0, 0.6); color: white;
             border: 2px solid var(--primary); padding: 8px 12px;
-            border-radius: 10px; cursor: pointer; outline: none;
+            border-radius: 10px; cursor: pointer; outline: none; backdrop-filter: blur(5px);
         }
 
         .theme-btn {
@@ -43,29 +41,23 @@
             padding: 8px; border-radius: 50%; cursor: pointer; margin-left: 5px; font-size: 1.2rem;
         }
 
-        .stars {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(white, transparent 2%);
-            background-size: 50px 50px; animation: moveStars 120s linear infinite;
-            z-index: -1; opacity: 0.2;
-        }
-
-        @keyframes moveStars { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
-
         .capsule-container {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1); padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1); padding: 2.5rem;
             border-radius: 30px; text-align: center; width: 85%; max-width: 400px;
             box-shadow: 0 0 40px var(--accent);
         }
 
+        .logo-container { margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
         input, textarea {
             width: 100%; background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
-            color: white; padding: 12px; margin-bottom: 15px; box-sizing: border-box;
+            color: white; padding: 12px; margin-bottom: 15px; box-sizing: border-box; outline: none;
         }
 
-        .hidden-note { -webkit-text-security: disc; }
+        .hidden-note { -webkit-text-security: disc; } /* إخفاء الرسالة أثناء الكتابة */
 
         input[type="datetime-local"] { background: white; color: black; }
 
@@ -74,12 +66,13 @@
             border: none; padding: 15px; border-radius: 50px;
             font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s;
         }
+        .main-btn:hover { opacity: 0.8; transform: scale(1.02); }
 
         .status-box { margin-top: 20px; display: none; }
-        
         #messageDisplay {
-            background: rgba(255,255,255,0.1); padding: 15px;
-            border-radius: 10px; margin-top: 10px; font-style: italic; border: 1px dashed var(--primary);
+            background: rgba(255,255,255,0.05); padding: 15px;
+            border-radius: 10px; margin-top: 10px; font-style: italic;
+            border: 1px dashed var(--primary); display: none;
         }
     </style>
 </head>
@@ -107,9 +100,8 @@
 
     <div class="capsule-container">
         <div class="logo-container">
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="var(--primary)" stroke-width="2" fill="var(--accent)"/>
-                <circle cx="12" cy="12" r="3" stroke="var(--primary)" stroke-width="2"/>
             </svg>
         </div>
 
@@ -131,7 +123,7 @@
         <div id="statusArea" class="status-box">
             <h3 id="timerTitle">مغلقة</h3>
             <div id="countdown" style="font-size: 2rem; margin: 15px 0; color: var(--primary); font-weight: bold;"></div>
-            <div id="messageDisplay" style="display: none;"></div>
+            <div id="messageDisplay"></div>
             <button class="main-btn" id="resetBtn" onclick="resetAll()" style="display:none; margin-top:20px; background:#ef4444; color:white;">🔄</button>
         </div>
     </div>
@@ -139,13 +131,12 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
         const translations = {
-            ar: { title: "كبسولة الزمن 🚀", authDesc: "سجل دخولك لتصلك تنبيهات Gmail", loginBtn: "دخول المستكشف 👨‍🚀", desc: "اكتب رسالة للمستقبل:", placeholder: "اكتب أسرارك هنا...", lockBtn: "قفل الكبسولة 🔒", timerTitle: "الكبسولة في المدار...", resetBtn: "جديد 🔄", alert: "أكمل البيانات!", emailSub: "تم قفل كبسولتك بنجاح!", emailBody: "مرحباً، تم حفظ رسالتك. موعد الفتح: ", success: "تم إرسال تأكيد لبريدك!", unlockSub: "🔓 فتحت كبسولتك الآن!", unlockBody: "رسالتك من الماضي أصبحت متاحة الآن.", dir: "rtl" },
-            en: { title: "Time Capsule 🚀", authDesc: "Login for Gmail alerts", loginBtn: "Explorer Login 👨‍🚀", desc: "Write to the future:", placeholder: "Your secrets...", lockBtn: "Lock 🔒", timerTitle: "In orbit...", resetBtn: "New 🔄", alert: "Fill fields!", emailSub: "Capsule Locked Successfully!", emailBody: "Hello, message saved. Unlock date: ", success: "Confirmation sent!", unlockSub: "🔓 Capsule Unlocked Now!", unlockBody: "Your message is now available.", dir: "ltr" }
+            ar: { title: "كبسولة الزمن 🚀", authDesc: "سجل دخولك لتصلك تنبيهات Gmail", loginBtn: "دخول المستكشف 👨‍🚀", desc: "اكتب رسالة للمستقبل:", placeholder: "اكتب أسرارك هنا...", lockBtn: "قفل الكبسولة 🔒", timerTitle: "الكبسولة في المدار...", resetBtn: "جديد 🔄", alert: "أكمل البيانات!", emailSub: "تم قفل كبسولتك بنجاح!", emailBody: "مرحباً، تم حفظ رسالتك. موعد الفتح: ", success: "تم إرسال تأكيد لبريدك!", unlockSub: "🔓 فتحت كبسولتك الآن!", unlockBody: "رسالتك من الماضي متاحة الآن. ارجع للموقع عبر الرابط:", revealBtn: "كشف الرسالة وإرسال إشعار", dir: "rtl" },
+            en: { title: "Time Capsule 🚀", authDesc: "Login for Gmail alerts", loginBtn: "Explorer Login 👨‍🚀", desc: "Write to the future:", placeholder: "Your secrets...", lockBtn: "Lock 🔒", timerTitle: "In orbit...", resetBtn: "New 🔄", alert: "Fill fields!", emailSub: "Capsule Locked!", emailBody: "Hello, message saved. Unlock date: ", success: "Confirmation sent!", unlockSub: "🔓 Capsule Unlocked!", unlockBody: "Your message is ready. Return via link:", revealBtn: "Reveal & Notify Me", dir: "ltr" }
         };
 
         let currentLang = localStorage.getItem('lang') || 'ar';
         let currentTheme = localStorage.getItem('theme') || 'default';
-        let isNotificationSent = false; 
         
         emailjs.init("NinIk0LzvyV4NVzoD");
 
@@ -189,18 +180,17 @@
 
             if (!date || !note) { alert(t.alert); return; }
 
-            // تشغيل صوت القفل
             document.getElementById('lockSound').play();
-
             localStorage.setItem('unlockTime', new Date(date).getTime());
             localStorage.setItem('secretNote', note);
 
             emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
                 email: email,
                 subject_line: t.emailSub,
-                message: "Capsule Locked Safely",
+                message: "Locked Securely",
                 open_date: date,
-                intro_text: t.emailBody
+                intro_text: t.emailBody,
+                site_link: window.location.href
             }).then(() => {
                 alert(t.success);
                 checkStatus();
@@ -209,23 +199,17 @@
 
         function checkStatus() {
             const unlockTime = localStorage.getItem('unlockTime');
-            const note = localStorage.getItem('secretNote');
             const email = localStorage.getItem('userEmail');
             const t = translations[currentLang] || translations['en'];
 
-            if (email) {
-                document.getElementById('authArea').style.display = 'none';
-                document.getElementById('setupArea').style.display = 'block';
-            }
+            if (email) { document.getElementById('authArea').style.display = 'none'; document.getElementById('setupArea').style.display = 'block'; }
 
             if (unlockTime) {
                 document.getElementById('setupArea').style.display = 'none';
                 document.getElementById('statusArea').style.display = 'block';
                 
                 const timerInterval = setInterval(() => {
-                    const now = new Date().getTime();
-                    const distance = unlockTime - now;
-
+                    const distance = unlockTime - new Date().getTime();
                     if (distance > 0) {
                         const d = Math.floor(distance / 86400000);
                         const h = Math.floor((distance % 86400000) / 3600000);
@@ -234,35 +218,32 @@
                         document.getElementById('countdown').innerHTML = `${d}d ${h}:${m}:${s}`;
                     } else {
                         clearInterval(timerInterval);
-                        if (!isNotificationSent) {
-                            // تشغيل صوت الفتح
-                            document.getElementById('unlockSound').play();
-                            sendUnlockNotification(email, t);
-                            isNotificationSent = true;
-                        }
-                        document.getElementById('timerTitle').innerHTML = "✨ Unlocked ✨";
-                        document.getElementById('countdown').style.display = 'none';
-                        document.getElementById('messageDisplay').style.display = 'block';
-                        document.getElementById('messageDisplay').innerHTML = `"${note}"`;
-                        document.getElementById('resetBtn').style.display = 'block';
+                        document.getElementById('timerTitle').innerHTML = "✨ Ready! ✨";
+                        document.getElementById('countdown').innerHTML = `<button class="main-btn" onclick="revealCapsule()">${t.revealBtn}</button>`;
                     }
                 }, 1000);
             }
         }
 
-       function sendUnlockNotification(email, t) {
-    // احصل على رابط الصفحة الحالية تلقائياً
-    const siteUrl = window.location.href; 
+        function revealCapsule() {
+            const email = localStorage.getItem('userEmail');
+            const note = localStorage.getItem('secretNote');
+            const t = translations[currentLang] || translations['en'];
 
-    emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
-        email: email,
-        subject_line: t.unlockSub,
-        // دمج الرابط داخل نص الرسالة مباشرة
-        message: "لقد حان الوقت! كبسولتك الزمنية فُتحت الآن. يمكنك رؤية رسالتك بالعودة للموقع عبر هذا الرابط: " + siteUrl,
-        intro_text: t.unlockBody,
-        site_link: siteUrl // سنبقيه أيضاً كمتغير احتياطي
-    });
-}
+            document.getElementById('unlockSound').play();
+            document.getElementById('messageDisplay').style.display = 'block';
+            document.getElementById('messageDisplay').innerHTML = `"${note}"`;
+            document.getElementById('resetBtn').style.display = 'block';
+            document.getElementById('countdown').style.display = 'none';
+
+            emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
+                email: email,
+                subject_line: t.unlockSub,
+                message: "Your capsule is open! Content: " + note,
+                intro_text: t.unlockBody,
+                site_link: window.location.href
+            }).then(() => console.log("Unlock Email Sent")).catch(err => console.log(err));
+        }
 
         function resetAll() { localStorage.clear(); location.reload(); }
 
