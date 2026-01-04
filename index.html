@@ -17,6 +17,16 @@
             transition: background 0.5s ease;
         }
 
+        /* تنسيق اللوجو */
+        .logo-container {
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
         .toolbar {
             position: absolute; top: 20px; width: 90%;
             display: flex; justify-content: space-between; align-items: center; z-index: 100;
@@ -44,7 +54,7 @@
 
         .capsule-container {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1); padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1); padding: 2rem;
             border-radius: 30px; text-align: center; width: 85%; max-width: 400px;
             box-shadow: 0 0 40px var(--accent);
         }
@@ -55,10 +65,7 @@
             color: white; padding: 12px; margin-bottom: 15px; box-sizing: border-box;
         }
 
-        /* جعل النص مخفياً أثناء الكتابة */
-        .hidden-note {
-            -webkit-text-security: disc; /* لإخفاء النص كنقاط في أغلب المتصفحات */
-        }
+        .hidden-note { -webkit-text-security: disc; }
 
         input[type="datetime-local"] { background: white; color: black; }
 
@@ -72,13 +79,16 @@
         
         #messageDisplay {
             background: rgba(255,255,255,0.1); padding: 15px;
-            border-radius: 10px; margin-top: 10px; font-style: italic;
+            border-radius: 10px; margin-top: 10px; font-style: italic; border: 1px dashed var(--primary);
         }
     </style>
 </head>
 <body id="bodyTag">
 
     <div class="stars"></div>
+
+    <audio id="lockSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="unlockSound" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
     <div class="toolbar">
         <select id="langSelect" onchange="changeLanguage(this.value)">
@@ -96,6 +106,13 @@
     </div>
 
     <div class="capsule-container">
+        <div class="logo-container">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="var(--primary)" stroke-width="2" fill="var(--accent)"/>
+                <circle cx="12" cy="12" r="3" stroke="var(--primary)" stroke-width="2"/>
+            </svg>
+        </div>
+
         <h1 id="title">كبسولة الزمن 🚀</h1>
 
         <div id="authArea">
@@ -122,9 +139,8 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
         const translations = {
-            ar: { title: "كبسولة الزمن 🚀", authDesc: "سجل دخولك لتصلك تنبيهات Gmail", loginBtn: "دخول المستكشف 👨‍🚀", desc: "اكتب رسالة للمستقبل:", placeholder: "اكتب أسرارك هنا...", lockBtn: "قفل الكبسولة 🔒", timerTitle: "الكبسولة في المدار...", resetBtn: "جديد 🔄", alert: "أكمل البيانات!", emailSub: "تم قفل كبسولتك بنجاح!", emailBody: "مرحباً، تم حفظ رسالتك. موعد الفتح: ", success: "تم إرسال تأكيد لبريدك!", unlockSub: "🔓 فتحت كبسولتك الآن!", unlockBody: "رسالتك من الماضي أصبحت متاحة الآن في الموقع.", dir: "rtl" },
-            en: { title: "Time Capsule 🚀", authDesc: "Login for Gmail alerts", loginBtn: "Explorer Login 👨‍🚀", desc: "Write to the future:", placeholder: "Your secrets...", lockBtn: "Lock 🔒", timerTitle: "In orbit...", resetBtn: "New 🔄", alert: "Fill fields!", emailSub: "Capsule Locked Successfully!", emailBody: "Hello, your message is saved. Unlock date: ", success: "Confirmation sent to your email!", unlockSub: "🔓 Capsule Unlocked Now!", unlockBody: "Your message from the past is now available on the site.", dir: "ltr" },
-            // ... (بقية اللغات)
+            ar: { title: "كبسولة الزمن 🚀", authDesc: "سجل دخولك لتصلك تنبيهات Gmail", loginBtn: "دخول المستكشف 👨‍🚀", desc: "اكتب رسالة للمستقبل:", placeholder: "اكتب أسرارك هنا...", lockBtn: "قفل الكبسولة 🔒", timerTitle: "الكبسولة في المدار...", resetBtn: "جديد 🔄", alert: "أكمل البيانات!", emailSub: "تم قفل كبسولتك بنجاح!", emailBody: "مرحباً، تم حفظ رسالتك. موعد الفتح: ", success: "تم إرسال تأكيد لبريدك!", unlockSub: "🔓 فتحت كبسولتك الآن!", unlockBody: "رسالتك من الماضي أصبحت متاحة الآن.", dir: "rtl" },
+            en: { title: "Time Capsule 🚀", authDesc: "Login for Gmail alerts", loginBtn: "Explorer Login 👨‍🚀", desc: "Write to the future:", placeholder: "Your secrets...", lockBtn: "Lock 🔒", timerTitle: "In orbit...", resetBtn: "New 🔄", alert: "Fill fields!", emailSub: "Capsule Locked Successfully!", emailBody: "Hello, message saved. Unlock date: ", success: "Confirmation sent!", unlockSub: "🔓 Capsule Unlocked Now!", unlockBody: "Your message is now available.", dir: "ltr" }
         };
 
         let currentLang = localStorage.getItem('lang') || 'ar';
@@ -173,13 +189,16 @@
 
             if (!date || !note) { alert(t.alert); return; }
 
+            // تشغيل صوت القفل
+            document.getElementById('lockSound').play();
+
             localStorage.setItem('unlockTime', new Date(date).getTime());
             localStorage.setItem('secretNote', note);
 
             emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
                 email: email,
                 subject_line: t.emailSub,
-                message: "قفل كبسولة (المحتوى مخفي للأمان)",
+                message: "Capsule Locked Safely",
                 open_date: date,
                 intro_text: t.emailBody
             }).then(() => {
@@ -215,30 +234,35 @@
                         document.getElementById('countdown').innerHTML = `${d}d ${h}:${m}:${s}`;
                     } else {
                         clearInterval(timerInterval);
+                        if (!isNotificationSent) {
+                            // تشغيل صوت الفتح
+                            document.getElementById('unlockSound').play();
+                            sendUnlockNotification(email, t);
+                            isNotificationSent = true;
+                        }
                         document.getElementById('timerTitle').innerHTML = "✨ Unlocked ✨";
                         document.getElementById('countdown').style.display = 'none';
                         document.getElementById('messageDisplay').style.display = 'block';
                         document.getElementById('messageDisplay').innerHTML = `"${note}"`;
                         document.getElementById('resetBtn').style.display = 'block';
-
-                        // إرسال إشعار فتح الكبسولة لمرة واحدة فقط
-                        if (!isNotificationSent) {
-                            sendUnlockNotification(email, t);
-                            isNotificationSent = true;
-                        }
                     }
                 }, 1000);
             }
         }
 
-        function sendUnlockNotification(email, t) {
-            emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
-                email: email,
-                subject_line: t.unlockSub,
-                message: "تم فتح كبسولتك بنجاح! تفضل بزيارة الموقع لرؤية المحتوى.",
-                intro_text: t.unlockBody
-            });
-        }
+       function sendUnlockNotification(email, t) {
+    // احصل على رابط الصفحة الحالية تلقائياً
+    const siteUrl = window.location.href; 
+
+    emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
+        email: email,
+        subject_line: t.unlockSub,
+        // دمج الرابط داخل نص الرسالة مباشرة
+        message: "لقد حان الوقت! كبسولتك الزمنية فُتحت الآن. يمكنك رؤية رسالتك بالعودة للموقع عبر هذا الرابط: " + siteUrl,
+        intro_text: t.unlockBody,
+        site_link: siteUrl // سنبقيه أيضاً كمتغير احتياطي
+    });
+}
 
         function resetAll() { localStorage.clear(); location.reload(); }
 
