@@ -1,269 +1,162 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="htmlTag">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time Capsule | كبسولة الزمن</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
-        :root { --primary: #38bdf8; --bg-dark: #020617; --accent: rgba(56, 189, 248, 0.2); }
-        .theme-purple { --primary: #a855f7; --bg-dark: #1e1b4b; --accent: rgba(168, 85, 247, 0.2); }
-        .theme-green { --primary: #22c55e; --bg-dark: #052e16; --accent: rgba(34, 197, 94, 0.2); }
-
+        :root { --primary: #38bdf8; --bg-dark: #020617; }
         body {
             background-color: var(--bg-dark); color: white;
-            font-family: 'Segoe UI', sans-serif; margin: 0;
-            display: flex; flex-direction: column; justify-content: center;
-            align-items: center; height: 100vh; overflow: hidden;
-            transition: background 0.5s ease;
+            font-family: 'Segoe UI', sans-serif; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; margin: 0; text-align: center;
         }
-
-        .stars {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(white, transparent 2%);
-            background-size: 50px 50px; animation: moveStars 120s linear infinite;
-            z-index: -1; opacity: 0.2;
+        .container {
+            background: rgba(255, 255, 255, 0.05); padding: 2rem;
+            border-radius: 20px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1); width: 85%; max-width: 400px;
         }
-        @keyframes moveStars { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
-
-        .toolbar {
-            position: absolute; top: 20px; width: 90%;
-            display: flex; justify-content: space-between; align-items: center; z-index: 100;
-        }
-
-        #langSelect {
-            background: rgba(0, 0, 0, 0.6); color: white;
-            border: 2px solid var(--primary); padding: 8px 12px;
-            border-radius: 10px; cursor: pointer; outline: none;
-        }
-
-        .theme-btn {
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px; border-radius: 50%; cursor: pointer; margin-left: 5px; font-size: 1.2rem;
-        }
-
-        .capsule-container {
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1); padding: 2.5rem;
-            border-radius: 30px; text-align: center; width: 85%; max-width: 400px;
-            box-shadow: 0 0 40px var(--accent);
-        }
-
-        .logo-container { margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
         input, textarea {
-            width: 100%; background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
-            color: white; padding: 12px; margin-bottom: 15px; box-sizing: border-box; outline: none;
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px;
+            border: 1px solid #333; background: #000; color: white; outline: none;
         }
-
         .hidden-note { -webkit-text-security: disc; }
-
-        input[type="datetime-local"] { background: white; color: black; }
-
-        .main-btn {
-            background: var(--primary); color: var(--bg-dark);
-            border: none; padding: 15px; border-radius: 50px;
-            font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s;
+        button {
+            background: var(--primary); color: #000; border: none;
+            padding: 12px 25px; border-radius: 50px; cursor: pointer;
+            font-weight: bold; width: 100%; margin-top: 10px;
         }
-
-        .status-box { margin-top: 20px; display: none; }
-        #messageDisplay {
-            background: rgba(255,255,255,0.05); padding: 15px;
-            border-radius: 10px; margin-top: 10px; font-style: italic;
-            border: 1px dashed var(--primary); display: none;
+        #countdown { font-size: 2.5rem; color: var(--primary); margin: 20px 0; }
+        #messageDisplay { 
+            display: none; padding: 20px; border: 2px dashed var(--primary); 
+            margin-top: 20px; background: rgba(56, 189, 248, 0.1);
         }
     </style>
 </head>
-<body id="bodyTag">
+<body>
 
-    <div class="stars"></div>
-
-    <audio id="lockSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
-    <audio id="unlockSound" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
-
-    <div class="toolbar">
-        <select id="langSelect" onchange="changeLanguage(this.value)">
-            <option value="ar">العربية</option>
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-            <option value="zh">中文</option>
-            <option value="es">Español</option>
-        </select>
-        <div class="themes">
-            <button class="theme-btn" onclick="setTheme('default')">🔵</button>
-            <button class="theme-btn" onclick="setTheme('purple')">🟣</button>
-            <button class="theme-btn" onclick="setTheme('green')">🟢</button>
-        </div>
-    </div>
-
-    <div class="capsule-container">
-        <div class="logo-container">
-            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="var(--primary)" stroke-width="2" fill="var(--accent)"/>
-            </svg>
-        </div>
-
-        <h1 id="title">كبسولة الزمن 🚀</h1>
+    <div class="container">
+        <h1>كبسولة الزمن 🚀</h1>
 
         <div id="authArea">
-            <p id="authDesc">سجل دخولك لتصلك تنبيهات Gmail</p>
-            <input type="email" id="userEmail" placeholder="example@gmail.com">
-            <button class="main-btn" id="loginBtn" onclick="startExperience()">دخول المستكشف 👨‍🚀</button>
+            <p>أدخل إيميلك لاستلام التنبيهات</p>
+            <input type="email" id="userEmailInput" placeholder="example@gmail.com">
+            <button onclick="startExperience()">دخول المستكشف 👨‍🚀</button>
         </div>
 
-        <div id="setupArea" style="display: none;">
-            <p id="desc">اكتب رسالة للمستقبل:</p>
-            <textarea id="userNote" class="hidden-note" onfocus="this.classList.remove('hidden-note')" onblur="this.classList.add('hidden-note')"></textarea>
+        <div id="setupArea" style="display:none;">
+            <p>اكتب رسالتك للمستقبل:</p>
+            <textarea id="userNote" class="hidden-note" placeholder="أسرارك هنا..." onfocus="this.classList.remove('hidden-note')" onblur="this.classList.add('hidden-note')"></textarea>
             <input type="datetime-local" id="openDate">
-            <button class="main-btn" id="lockBtn" onclick="lockCapsule()">قفل الكبسولة 🔒</button>
+            <button onclick="lockCapsule()">قفل الكبسولة 🔒</button>
         </div>
 
-        <div id="statusArea" class="status-box">
-            <h3 id="timerTitle">مغلقة</h3>
-            <div id="countdown" style="font-size: 2rem; margin: 15px 0; color: var(--primary); font-weight: bold;"></div>
+        <div id="statusArea" style="display:none;">
+            <h3 id="timerStatus">الكبسولة في المدار...</h3>
+            <div id="countdown">00:00:00</div>
             <div id="messageDisplay"></div>
-            <button class="main-btn" id="resetBtn" onclick="resetAll()" style="display:none; margin-top:20px; background:#ef4444; color:white;">🔄</button>
+            <button onclick="resetAll()" id="resetBtn" style="display:none; background: #ff4444; color: white;">بدء كبسولة جديدة 🔄</button>
         </div>
     </div>
 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
-        const translations = {
-            ar: { title: "كبسولة الزمن 🚀", authDesc: "سجل دخولك لتصلك تنبيهات Gmail", loginBtn: "دخول المستكشف 👨‍🚀", desc: "اكتب رسالة للمستقبل:", placeholder: "اكتب أسرارك هنا...", lockBtn: "قفل الكبسولة 🔒", timerTitle: "الكبسولة في المدار...", resetBtn: "جديد 🔄", alert: "أكمل البيانات!", emailSub: "تم قفل كبسولتك بنجاح!", emailBody: "مرحباً، تم حفظ رسالتك. موعد الفتح: ", success: "تم إرسال تأكيد لبريدك!", unlockSub: "🔓 فتحت كبسولتك الآن!", unlockBody: "رسالتك من الماضي متاحة الآن. ارجع للموقع عبر الرابط:", dir: "rtl" },
-            en: { title: "Time Capsule 🚀", authDesc: "Login for Gmail alerts", loginBtn: "Explorer Login 👨‍🚀", desc: "Write to the future:", placeholder: "Your secrets...", lockBtn: "Lock 🔒", timerTitle: "In orbit...", resetBtn: "New 🔄", alert: "Fill fields!", emailSub: "Capsule Locked!", emailBody: "Hello, message saved. Unlock date: ", success: "Confirmation sent!", unlockSub: "🔓 Capsule Unlocked!", unlockBody: "Your message is ready. Return via link:", dir: "ltr" }
-        };
-
-        let currentLang = localStorage.getItem('lang') || 'ar';
-        let isRevealed = false;
-        
+        // تهيئة الخدمة بالمفتاح الخاص بك
         emailjs.init("NinIk0LzvyV4NVzoD");
 
-        // مراقب التفاعل لضمان صلاحيات المتصفح على GitHub
-        document.addEventListener('click', () => { console.log("User Interaction Detected"); }, { once: true });
-
-        function setTheme(theme) {
-            document.getElementById('bodyTag').className = (theme === 'default' ? '' : 'theme-' + theme);
-            localStorage.setItem('theme', theme);
-        }
-
-        function changeLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('lang', lang);
-            updateUI();
-        }
-
-        function updateUI() {
-            const t = translations[currentLang] || translations['en'];
-            document.getElementById('htmlTag').dir = t.dir;
-            document.getElementById('title').innerText = t.title;
-            document.getElementById('authDesc').innerText = t.authDesc;
-            document.getElementById('loginBtn').innerText = t.loginBtn;
-            document.getElementById('desc').innerText = t.desc;
-            document.getElementById('userNote').placeholder = t.placeholder;
-            document.getElementById('lockBtn').innerText = t.lockBtn;
-            document.getElementById('timerTitle').innerText = t.timerTitle;
-            document.getElementById('resetBtn').innerText = t.resetBtn;
-        }
-
         function startExperience() {
-            const email = document.getElementById('userEmail').value;
+            const email = document.getElementById('userEmailInput').value;
             if (email.includes('@')) {
                 localStorage.setItem('userEmail', email);
                 checkStatus();
-            } else { alert(translations[currentLang].alert); }
+            } else { alert("يرجى إدخال إيميل صحيح"); }
         }
 
         function lockCapsule() {
             const date = document.getElementById('openDate').value;
             const note = document.getElementById('userNote').value;
             const email = localStorage.getItem('userEmail');
-            const t = translations[currentLang] || translations['en'];
 
-            if (!date || !note) { alert(t.alert); return; }
+            if (!date || !note) { alert("يرجى إكمال جميع البيانات"); return; }
 
-            document.getElementById('lockSound').play();
             localStorage.setItem('unlockTime', new Date(date).getTime());
             localStorage.setItem('secretNote', note);
 
+            // إرسال إيميل التأكيد فور القفل
             emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
-                email: email,
-                subject_line: t.emailSub,
-                message: "Capsule Locked Successfully",
-                open_date: date,
-                intro_text: t.emailBody,
+                userEmail: email, // تأكد أن هذا الاسم يطابق {{userEmail}} في EmailJS
+                subject_line: "تم قفل كبسولتك بنجاح! 🔒",
+                message: "رسالتك محفوظة الآن وسيتم فتحها تلقائياً عند انتهاء الوقت.",
                 site_link: window.location.href
             }).then(() => {
-                alert(t.success);
+                alert("تم إرسال تأكيد لبريدك!");
                 checkStatus();
-            });
+            }).catch(err => console.error("EmailJS Error:", err));
         }
 
         function checkStatus() {
             const unlockTime = localStorage.getItem('unlockTime');
             const email = localStorage.getItem('userEmail');
 
-            if (email) { 
-                document.getElementById('authArea').style.display = 'none'; 
-                document.getElementById('setupArea').style.display = 'block'; 
-            }
+            if (email) document.getElementById('authArea').style.display = 'none';
 
             if (unlockTime) {
                 document.getElementById('setupArea').style.display = 'none';
                 document.getElementById('statusArea').style.display = 'block';
-                
-                const timerInterval = setInterval(() => {
-                    const now = new Date().getTime();
-                    const distance = unlockTime - now;
 
-                    if (distance > 0) {
-                        const d = Math.floor(distance / 86400000);
-                        const h = Math.floor((distance % 86400000) / 3600000);
-                        const m = Math.floor((distance % 3600000) / 60000);
-                        const s = Math.floor((distance % 60000) / 1000);
-                        document.getElementById('countdown').innerHTML = `${d}d ${h}:${m}:${s}`;
-                    } else {
-                        clearInterval(timerInterval);
-                        if (!isRevealed) {
-                            revealCapsuleAutomatically();
-                            isRevealed = true;
+                const interval = setInterval(() => {
+                    const now = new Date().getTime();
+                    const diff = unlockTime - now;
+
+                    if (diff <= 0) {
+                        clearInterval(interval);
+                        if (!window.isOpened) {
+                            revealAutomatically();
+                            window.isOpened = true;
                         }
+                    } else {
+                        const h = Math.floor(diff / 3600000);
+                        const m = Math.floor((diff % 3600000) / 60000);
+                        const s = Math.floor((diff % 60000) / 1000);
+                        document.getElementById('countdown').innerHTML = `${h}:${m}:${s}`;
                     }
                 }, 1000);
+            } else if (email) {
+                document.getElementById('setupArea').style.display = 'block';
             }
         }
 
-        function revealCapsuleAutomatically() {
+        function revealAutomatically() {
             const email = localStorage.getItem('userEmail');
             const note = localStorage.getItem('secretNote');
-            const t = translations[currentLang] || translations['en'];
 
-            document.getElementById('timerTitle').innerHTML = "✨ Unlocked! ✨";
+            document.getElementById('timerStatus').innerText = "✨ فتحت الكبسولة! ✨";
             document.getElementById('countdown').style.display = 'none';
             document.getElementById('messageDisplay').style.display = 'block';
-            document.getElementById('messageDisplay').innerHTML = `"${note}"`;
+            document.getElementById('messageDisplay').innerText = `"${note}"`;
             document.getElementById('resetBtn').style.display = 'block';
-            
-            document.getElementById('unlockSound').play().catch(() => {});
 
-            // إرسال الإيميل مع تأخير 1.5 ثانية لضمان استقرار الشبكة على GitHub
-            setTimeout(() => {
-                emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
-                    email: email,
-                    subject_line: t.unlockSub,
-                    message: note,
-                    intro_text: t.unlockBody,
-                    site_link: window.location.href
-                }).then(() => console.log("Success from GitHub")).catch(err => console.error(err));
-            }, 1500);
+            // إرسال إيميل الفتح التلقائي
+            emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
+                userEmail: email,
+                subject_line: "🔓 كبسولتك الزمنية فُتحت الآن!",
+                message: "محتوى رسالتك من الماضي هو: " + note,
+                site_link: window.location.href
+            }).then(() => {
+                console.log("تم إرسال إشعار الفتح بنجاح.");
+            });
         }
 
-        function resetAll() { localStorage.clear(); location.reload(); }
+        function resetAll() {
+            localStorage.clear();
+            location.reload();
+        }
 
-        updateUI();
         checkStatus();
     </script>
 </body>
 </html>
+
 
 
