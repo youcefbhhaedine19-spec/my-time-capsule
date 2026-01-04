@@ -33,7 +33,7 @@
         #langSelect {
             background: rgba(0, 0, 0, 0.6); color: white;
             border: 2px solid var(--primary); padding: 8px 12px;
-            border-radius: 10px; cursor: pointer; outline: none; backdrop-filter: blur(5px);
+            border-radius: 10px; cursor: pointer; outline: none;
         }
 
         .theme-btn {
@@ -57,7 +57,7 @@
             color: white; padding: 12px; margin-bottom: 15px; box-sizing: border-box; outline: none;
         }
 
-        .hidden-note { -webkit-text-security: disc; } /* إخفاء الرسالة أثناء الكتابة */
+        .hidden-note { -webkit-text-security: disc; }
 
         input[type="datetime-local"] { background: white; color: black; }
 
@@ -66,7 +66,6 @@
             border: none; padding: 15px; border-radius: 50px;
             font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s;
         }
-        .main-btn:hover { opacity: 0.8; transform: scale(1.02); }
 
         .status-box { margin-top: 20px; display: none; }
         #messageDisplay {
@@ -131,12 +130,13 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
         const translations = {
-            ar: { title: "كبسولة الزمن 🚀", authDesc: "سجل دخولك لتصلك تنبيهات Gmail", loginBtn: "دخول المستكشف 👨‍🚀", desc: "اكتب رسالة للمستقبل:", placeholder: "اكتب أسرارك هنا...", lockBtn: "قفل الكبسولة 🔒", timerTitle: "الكبسولة في المدار...", resetBtn: "جديد 🔄", alert: "أكمل البيانات!", emailSub: "تم قفل كبسولتك بنجاح!", emailBody: "مرحباً، تم حفظ رسالتك. موعد الفتح: ", success: "تم إرسال تأكيد لبريدك!", unlockSub: "🔓 فتحت كبسولتك الآن!", unlockBody: "رسالتك من الماضي متاحة الآن. ارجع للموقع عبر الرابط:", revealBtn: "كشف الرسالة وإرسال إشعار", dir: "rtl" },
-            en: { title: "Time Capsule 🚀", authDesc: "Login for Gmail alerts", loginBtn: "Explorer Login 👨‍🚀", desc: "Write to the future:", placeholder: "Your secrets...", lockBtn: "Lock 🔒", timerTitle: "In orbit...", resetBtn: "New 🔄", alert: "Fill fields!", emailSub: "Capsule Locked!", emailBody: "Hello, message saved. Unlock date: ", success: "Confirmation sent!", unlockSub: "🔓 Capsule Unlocked!", unlockBody: "Your message is ready. Return via link:", revealBtn: "Reveal & Notify Me", dir: "ltr" }
+            ar: { title: "كبسولة الزمن 🚀", authDesc: "سجل دخولك لتصلك تنبيهات Gmail", loginBtn: "دخول المستكشف 👨‍🚀", desc: "اكتب رسالة للمستقبل:", placeholder: "اكتب أسرارك هنا...", lockBtn: "قفل الكبسولة 🔒", timerTitle: "الكبسولة في المدار...", resetBtn: "جديد 🔄", alert: "أكمل البيانات!", emailSub: "تم قفل كبسولتك بنجاح!", emailBody: "مرحباً، تم حفظ رسالتك. موعد الفتح: ", success: "تم إرسال تأكيد لبريدك!", unlockSub: "🔓 فتحت كبسولتك الآن!", unlockBody: "رسالتك من الماضي متاحة الآن. ارجع للموقع عبر الرابط:", dir: "rtl" },
+            en: { title: "Time Capsule 🚀", authDesc: "Login for Gmail alerts", loginBtn: "Explorer Login 👨‍🚀", desc: "Write to the future:", placeholder: "Your secrets...", lockBtn: "Lock 🔒", timerTitle: "In orbit...", resetBtn: "New 🔄", alert: "Fill fields!", emailSub: "Capsule Locked!", emailBody: "Hello, message saved. Unlock date: ", success: "Confirmation sent!", unlockSub: "🔓 Capsule Unlocked!", unlockBody: "Your message is ready. Return via link:", dir: "ltr" }
         };
 
         let currentLang = localStorage.getItem('lang') || 'ar';
         let currentTheme = localStorage.getItem('theme') || 'default';
+        let isRevealed = false;
         
         emailjs.init("NinIk0LzvyV4NVzoD");
 
@@ -187,29 +187,33 @@
             emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
                 email: email,
                 subject_line: t.emailSub,
-                message: "Locked Securely",
+                message: "Capsule Locked Successfully",
                 open_date: date,
                 intro_text: t.emailBody,
                 site_link: window.location.href
             }).then(() => {
                 alert(t.success);
                 checkStatus();
-            });
+            }).catch(err => console.error("EmailJS Error:", err));
         }
 
         function checkStatus() {
             const unlockTime = localStorage.getItem('unlockTime');
             const email = localStorage.getItem('userEmail');
-            const t = translations[currentLang] || translations['en'];
 
-            if (email) { document.getElementById('authArea').style.display = 'none'; document.getElementById('setupArea').style.display = 'block'; }
+            if (email) { 
+                document.getElementById('authArea').style.display = 'none'; 
+                document.getElementById('setupArea').style.display = 'block'; 
+            }
 
             if (unlockTime) {
                 document.getElementById('setupArea').style.display = 'none';
                 document.getElementById('statusArea').style.display = 'block';
                 
                 const timerInterval = setInterval(() => {
-                    const distance = unlockTime - new Date().getTime();
+                    const now = new Date().getTime();
+                    const distance = unlockTime - now;
+
                     if (distance > 0) {
                         const d = Math.floor(distance / 86400000);
                         const h = Math.floor((distance % 86400000) / 3600000);
@@ -218,31 +222,36 @@
                         document.getElementById('countdown').innerHTML = `${d}d ${h}:${m}:${s}`;
                     } else {
                         clearInterval(timerInterval);
-                        document.getElementById('timerTitle').innerHTML = "✨ Ready! ✨";
-                        document.getElementById('countdown').innerHTML = `<button class="main-btn" onclick="revealCapsule()">${t.revealBtn}</button>`;
+                        if (!isRevealed) {
+                            revealCapsuleAutomatically();
+                            isRevealed = true;
+                        }
                     }
                 }, 1000);
             }
         }
 
-        function revealCapsule() {
+        function revealCapsuleAutomatically() {
             const email = localStorage.getItem('userEmail');
             const note = localStorage.getItem('secretNote');
             const t = translations[currentLang] || translations['en'];
 
-            document.getElementById('unlockSound').play();
+            document.getElementById('timerTitle').innerHTML = "✨ Unlocked! ✨";
+            document.getElementById('countdown').style.display = 'none';
             document.getElementById('messageDisplay').style.display = 'block';
             document.getElementById('messageDisplay').innerHTML = `"${note}"`;
             document.getElementById('resetBtn').style.display = 'block';
-            document.getElementById('countdown').style.display = 'none';
+            
+            document.getElementById('unlockSound').play().catch(() => {});
 
+            // إرسال إيميل الفتح التلقائي
             emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
                 email: email,
                 subject_line: t.unlockSub,
-                message: "Your capsule is open! Content: " + note,
+                message: note,
                 intro_text: t.unlockBody,
                 site_link: window.location.href
-            }).then(() => console.log("Unlock Email Sent")).catch(err => console.log(err));
+            }).then(() => console.log("Unlock Email Sent")).catch(err => console.error(err));
         }
 
         function resetAll() { localStorage.clear(); location.reload(); }
@@ -252,3 +261,4 @@
     </script>
 </body>
 </html>
+
