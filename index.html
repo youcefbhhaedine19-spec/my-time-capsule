@@ -1,162 +1,213 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="htmlTag">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time Capsule | كبسولة الزمن</title>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
-        :root { --primary: #38bdf8; --bg-dark: #020617; }
+        :root { 
+            --primary: #38bdf8; 
+            --bg: #020617; 
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        .theme-purple { --primary: #a855f7; --bg: #1e1b4b; }
+        .theme-green { --primary: #22c55e; --bg: #052e16; }
+
         body {
-            background-color: var(--bg-dark); color: white;
-            font-family: 'Segoe UI', sans-serif; display: flex;
-            flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; margin: 0; text-align: center;
+            background-color: var(--bg); color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; height: 100vh; display: flex; align-items: center;
+            justify-content: center; overflow: hidden; transition: 0.5s;
         }
+
+        /* تأثير النجوم المتحركة */
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+                        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+                        radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0));
+            background-repeat: repeat; background-size: 200px 200px;
+            animation: moveStars 100s linear infinite; z-index: -1; opacity: 0.3;
+        }
+        @keyframes moveStars { from { transform: translateY(0); } to { transform: translateY(-1000px); } }
+
         .container {
-            background: rgba(255, 255, 255, 0.05); padding: 2rem;
-            border-radius: 20px; backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1); width: 85%; max-width: 400px;
+            background: var(--glass); backdrop-filter: blur(20px);
+            padding: 2.5rem; border-radius: 30px; border: 1px solid var(--border);
+            width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative;
         }
+
+        .toolbar { position: absolute; top: -55px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        select, .theme-btn { 
+            background: var(--glass); border: 1px solid var(--border); color: white; 
+            padding: 8px 12px; border-radius: 12px; cursor: pointer; outline: none;
+        }
+
+        h1 { font-size: 1.8rem; margin-bottom: 1rem; color: var(--primary); text-shadow: 0 0 15px var(--primary); }
+        
         input, textarea {
-            width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px;
-            border: 1px solid #333; background: #000; color: white; outline: none;
+            width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px;
+            border: 1px solid var(--border); background: rgba(0,0,0,0.4);
+            color: white; box-sizing: border-box; outline: none; transition: 0.3s;
         }
+        input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
+
         .hidden-note { -webkit-text-security: disc; }
+
         button {
             background: var(--primary); color: #000; border: none;
-            padding: 12px 25px; border-radius: 50px; cursor: pointer;
-            font-weight: bold; width: 100%; margin-top: 10px;
+            padding: 16px; border-radius: 50px; cursor: pointer;
+            width: 100%; font-weight: bold; font-size: 1rem; margin-top: 15px;
+            transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        #countdown { font-size: 2.5rem; color: var(--primary); margin: 20px 0; }
-        #messageDisplay { 
-            display: none; padding: 20px; border: 2px dashed var(--primary); 
-            margin-top: 20px; background: rgba(56, 189, 248, 0.1);
-        }
+        button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px var(--primary); opacity: 0.9; }
+
+        #countdown { font-size: 2.8rem; font-weight: bold; margin: 25px 0; color: var(--primary); letter-spacing: 2px; }
+        #messageDisplay { display: none; padding: 20px; border: 2px dashed var(--primary); border-radius: 15px; background: rgba(0,0,0,0.3); font-style: italic; font-size: 1.1rem; line-height: 1.6; }
     </style>
 </head>
-<body>
+<body id="bodyTag">
+
+    <div class="stars"></div>
 
     <div class="container">
-        <h1>كبسولة الزمن 🚀</h1>
-
-        <div id="authArea">
-            <p>أدخل إيميلك لاستلام التنبيهات</p>
-            <input type="email" id="userEmailInput" placeholder="example@gmail.com">
-            <button onclick="startExperience()">دخول المستكشف 👨‍🚀</button>
+        <div class="toolbar">
+            <select id="langSelect" onchange="changeLang(this.value)">
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+            </select>
+            <div style="display:flex; gap: 8px;">
+                <button class="theme-btn" style="background:#38bdf8" onclick="setTheme('default')"></button>
+                <button class="theme-btn" style="background:#a855f7" onclick="setTheme('purple')"></button>
+                <button class="theme-btn" style="background:#22c55e" onclick="setTheme('green')"></button>
+            </div>
         </div>
 
-        <div id="setupArea" style="display:none;">
-            <p>اكتب رسالتك للمستقبل:</p>
-            <textarea id="userNote" class="hidden-note" placeholder="أسرارك هنا..." onfocus="this.classList.remove('hidden-note')" onblur="this.classList.add('hidden-note')"></textarea>
-            <input type="datetime-local" id="openDate">
-            <button onclick="lockCapsule()">قفل الكبسولة 🔒</button>
+        <h1 id="title">كبسولة الزمن 🚀</h1>
+
+        <div id="step1">
+            <p id="p1">أدخل بريدك الإلكتروني المستهدف:</p>
+            <input type="email" id="emailInput" placeholder="example@gmail.com">
+            <button onclick="saveEmail()" id="btn1">ابدأ الرحلة 👨‍🚀</button>
         </div>
 
-        <div id="statusArea" style="display:none;">
-            <h3 id="timerStatus">الكبسولة في المدار...</h3>
+        <div id="step2" style="display:none;">
+            <p id="p2">اكتب رسالة للمستقبل:</p>
+            <textarea id="noteInput" class="hidden-note" placeholder="..." onfocus="this.classList.remove('hidden-note')" onblur="this.classList.add('hidden-note')"></textarea>
+            <input type="datetime-local" id="dateInput">
+            <button onclick="lockCapsule()" id="btn2">قفل الكبسولة 🔒</button>
+        </div>
+
+        <div id="step3" style="display:none;">
+            <p id="p3">سيتم الفتح والإرسال تلقائياً بعد:</p>
             <div id="countdown">00:00:00</div>
             <div id="messageDisplay"></div>
-            <button onclick="resetAll()" id="resetBtn" style="display:none; background: #ff4444; color: white;">بدء كبسولة جديدة 🔄</button>
+            <button onclick="resetAll()" id="btnReset" style="display:none; background:#ef4444; color:white;">إنشاء كبسولة جديدة 🔄</button>
         </div>
     </div>
 
     <script>
-        // تهيئة الخدمة بالمفتاح الخاص بك
-        emailjs.init("NinIk0LzvyV4NVzoD");
+        // دمج مفتاحك الخاص هنا مباشرة
+        const API_KEY = "33abda0d-9a62-43ba-bdd4-a1d4a62c8567"; 
 
-        function startExperience() {
-            const email = document.getElementById('userEmailInput').value;
-            if (email.includes('@')) {
-                localStorage.setItem('userEmail', email);
-                checkStatus();
-            } else { alert("يرجى إدخال إيميل صحيح"); }
+        const texts = {
+            ar: { title: "كبسولة الزمن 🚀", p1: "أدخل بريدك الإلكتروني المستهدف:", btn1: "ابدأ الرحلة 👨‍🚀", p2: "اكتب رسالة للمستقبل:", btn2: "قفل الكبسولة 🔒", p3: "سيتم الفتح والإرسال تلقائياً بعد:", reset: "إنشاء كبسولة جديدة 🔄", msgLock: "تم قفل كبسولتك بنجاح!" },
+            en: { title: "Time Capsule 🚀", p1: "Enter target email address:", btn1: "Start Journey 👨‍🚀", p2: "Write to the future:", btn2: "Lock Capsule 🔒", p3: "Auto-unlocking in:", reset: "Create New Capsule 🔄", msgLock: "Capsule Locked Successfully!" }
+        };
+
+        let currentLang = 'ar';
+
+        function changeLang(l) {
+            currentLang = l;
+            document.getElementById('htmlTag').dir = (l === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('title').innerText = texts[l].title;
+            document.getElementById('p1').innerText = texts[l].p1;
+            document.getElementById('btn1').innerText = texts[l].btn1;
+            document.getElementById('p2').innerText = texts[l].p2;
+            document.getElementById('btn2').innerText = texts[l].btn2;
+            document.getElementById('p3').innerText = texts[l].p3;
+            document.getElementById('btnReset').innerText = texts[l].reset;
+        }
+
+        function setTheme(t) {
+            document.getElementById('bodyTag').className = (t === 'default' ? '' : 'theme-' + t);
+        }
+
+        function saveEmail() {
+            const m = document.getElementById('emailInput').value;
+            if(m.includes('@')) { localStorage.setItem('u_mail', m); updateUI(); }
+            else { alert(currentLang === 'ar' ? "البريد غير صحيح" : "Invalid Email"); }
         }
 
         function lockCapsule() {
-            const date = document.getElementById('openDate').value;
-            const note = document.getElementById('userNote').value;
-            const email = localStorage.getItem('userEmail');
+            const d = document.getElementById('dateInput').value;
+            const n = document.getElementById('noteInput').value;
+            if(!d || !n) return alert(currentLang === 'ar' ? "أكمل البيانات" : "Fill all fields");
 
-            if (!date || !note) { alert("يرجى إكمال جميع البيانات"); return; }
-
-            localStorage.setItem('unlockTime', new Date(date).getTime());
-            localStorage.setItem('secretNote', note);
-
-            // إرسال إيميل التأكيد فور القفل
-            emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
-                userEmail: email, // تأكد أن هذا الاسم يطابق {{userEmail}} في EmailJS
-                subject_line: "تم قفل كبسولتك بنجاح! 🔒",
-                message: "رسالتك محفوظة الآن وسيتم فتحها تلقائياً عند انتهاء الوقت.",
-                site_link: window.location.href
-            }).then(() => {
-                alert("تم إرسال تأكيد لبريدك!");
-                checkStatus();
-            }).catch(err => console.error("EmailJS Error:", err));
+            localStorage.setItem('u_time', new Date(d).getTime());
+            localStorage.setItem('u_note', n);
+            sendMail(texts[currentLang].msgLock, "رسالتك مؤمنة في الفضاء الزمني وسيتم إرسالها لك فور انتهاء العداد.");
+            updateUI();
         }
 
-        function checkStatus() {
-            const unlockTime = localStorage.getItem('unlockTime');
-            const email = localStorage.getItem('userEmail');
-
-            if (email) document.getElementById('authArea').style.display = 'none';
-
-            if (unlockTime) {
-                document.getElementById('setupArea').style.display = 'none';
-                document.getElementById('statusArea').style.display = 'block';
-
-                const interval = setInterval(() => {
-                    const now = new Date().getTime();
-                    const diff = unlockTime - now;
-
-                    if (diff <= 0) {
-                        clearInterval(interval);
-                        if (!window.isOpened) {
-                            revealAutomatically();
-                            window.isOpened = true;
-                        }
-                    } else {
-                        const h = Math.floor(diff / 3600000);
-                        const m = Math.floor((diff % 3600000) / 60000);
-                        const s = Math.floor((diff % 60000) / 1000);
-                        document.getElementById('countdown').innerHTML = `${h}:${m}:${s}`;
-                    }
-                }, 1000);
-            } else if (email) {
-                document.getElementById('setupArea').style.display = 'block';
+        function updateUI() {
+            const m = localStorage.getItem('u_mail');
+            const t = localStorage.getItem('u_time');
+            if(m && !t) { document.getElementById('step1').style.display='none'; document.getElementById('step2').style.display='block'; }
+            else if(m && t) { 
+                document.getElementById('step1').style.display='none'; 
+                document.getElementById('step2').style.display='none'; 
+                document.getElementById('step3').style.display='block';
+                startTimer();
             }
         }
 
-        function revealAutomatically() {
-            const email = localStorage.getItem('userEmail');
-            const note = localStorage.getItem('secretNote');
+        function startTimer() {
+            const itv = setInterval(() => {
+                const diff = localStorage.getItem('u_time') - new Date().getTime();
+                if(diff <= 0) {
+                    clearInterval(itv);
+                    if(!window.isDone) { window.isDone=true; reveal(); }
+                } else {
+                    const h = Math.floor(diff / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    const s = Math.floor((diff % 60000) / 1000);
+                    document.getElementById('countdown').innerHTML = 
+                        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
 
-            document.getElementById('timerStatus').innerText = "✨ فتحت الكبسولة! ✨";
+        function reveal() {
+            const n = localStorage.getItem('u_note');
             document.getElementById('countdown').style.display = 'none';
+            document.getElementById('p3').style.display = 'none';
             document.getElementById('messageDisplay').style.display = 'block';
-            document.getElementById('messageDisplay').innerText = `"${note}"`;
-            document.getElementById('resetBtn').style.display = 'block';
-
-            // إرسال إيميل الفتح التلقائي
-            emailjs.send("service_fs1s2c5", "template_fdh2uj3", {
-                userEmail: email,
-                subject_line: "🔓 كبسولتك الزمنية فُتحت الآن!",
-                message: "محتوى رسالتك من الماضي هو: " + note,
-                site_link: window.location.href
-            }).then(() => {
-                console.log("تم إرسال إشعار الفتح بنجاح.");
-            });
+            document.getElementById('messageDisplay').innerText = `"${n}"`;
+            document.getElementById('btnReset').style.display = 'block';
+            sendMail("🔓 فُتحت كبسولتك الزمنية الآن!", "محتوى الرسالة التي أرسلتها من الماضي: \n\n" + n);
         }
 
-        function resetAll() {
-            localStorage.clear();
-            location.reload();
+        async function sendMail(sub, msg) {
+            try {
+                await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        access_key: API_KEY,
+                        email: localStorage.getItem('u_mail'),
+                        subject: sub,
+                        message: msg,
+                        from_name: "Time Capsule Bot"
+                    })
+                });
+            } catch (e) { console.error("Mail Error", e); }
         }
 
-        checkStatus();
+        function resetAll() { localStorage.clear(); location.reload(); }
+        updateUI();
     </script>
 </body>
 </html>
-
-
-
