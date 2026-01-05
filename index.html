@@ -10,299 +10,442 @@
             --bg: #020617; 
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.1);
+            --shadow: rgba(0, 0, 0, 0.5);
         }
-        /* ثيمات الألوان */
+        
+        /* ثيمات إضافية */
         .theme-purple { --primary: #a855f7; --bg: #1e1b4b; }
         .theme-green { --primary: #22c55e; --bg: #052e16; }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background-color: var(--bg); color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; height: 100vh; display: flex; align-items: center;
-            justify-content: center; overflow: hidden; transition: background-color 0.5s ease;
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* خلفية النجوم المتحركة */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            opacity: 0.4;
+        }
+
         .stars {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
-                        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
-                        radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0));
-            background-repeat: repeat; background-size: 200px 200px;
-            animation: moveStars 100s linear infinite; z-index: -1; opacity: 0.3;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+                        radial-gradient(1px 1px at 50px 70px, #fff, rgba(0,0,0,0)),
+                        radial-gradient(2px 2px at 100px 150px, #fff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 250px 250px;
+            animation: moveStars 120s linear infinite;
         }
-        @keyframes moveStars { from { transform: translateY(0); } to { transform: translateY(-1000px); } }
 
-        /* حاوية الكبسولة الزجاجية */
+        @keyframes moveStars {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-50%, -50%); }
+        }
+
+        /* الحاوية الرئيسية (Glassmorphism) */
         .container {
-            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            padding: 2.5rem; border-radius: 30px; border: 1px solid var(--border);
-            width: 90%; max-width: 420px; text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative;
-            display: flex; flex-direction: column; justify-content: space-between;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 40px;
+            border-radius: 35px;
+            border: 1px solid var(--border);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 25px 60px var(--shadow);
+            position: relative;
+            z-index: 10;
         }
 
-        /* شريط الأدوات العلوي */
-        .toolbar { 
-            display: flex; justify-content: space-between; align-items: center; 
+        /* شريط التحكم العلوي */
+        .header-tools {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .lang-btn, .theme-swatch {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+
+        .theme-swatch { width: 24px; height: 24px; border-radius: 50%; padding: 0; }
+
+        h1 {
+            font-size: 2rem;
             margin-bottom: 20px;
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            letter-spacing: 1px;
         }
-        select, .theme-btn { 
-            background: var(--glass); border: 1px solid var(--border); color: white; 
-            padding: 8px 12px; border-radius: 12px; cursor: pointer; outline: none; transition: 0.3s;
-        }
-        select:hover, .theme-btn:hover { background: rgba(255,255,255,0.1); }
 
-        h1 { font-size: 1.8rem; margin: 10px 0 20px 0; color: var(--primary); text-shadow: 0 0 15px var(--primary); }
-        
-        /* حقول الإدخال */
+        /* المدخلات */
+        .input-group { margin-bottom: 20px; text-align: right; }
+        [dir="ltr"] .input-group { text-align: left; }
+
+        label { display: block; margin-bottom: 8px; font-size: 0.9rem; opacity: 0.8; }
+
         input, textarea {
-            width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px;
-            border: 1px solid var(--border); background: rgba(0,0,0,0.4);
-            color: white; box-sizing: border-box; outline: none; transition: 0.3s;
-            font-family: inherit;
+            width: 100%;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
         }
-        input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
 
-        .hidden-note { -webkit-text-security: disc; }
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .hidden-content { -webkit-text-security: disc; }
 
         /* الأزرار */
-        button {
-            background: var(--primary); color: #000; border: none;
-            padding: 16px; border-radius: 50px; cursor: pointer;
-            width: 100%; font-weight: bold; font-size: 1rem; margin-top: 15px;
-            transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        .btn-main {
+            background: var(--primary);
+            color: #020617;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-top: 10px;
         }
-        button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px var(--primary); opacity: 0.9; }
+
+        .btn-main:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--primary);
+            filter: brightness(1.1);
+        }
 
         /* العداد */
-        #countdown { font-size: 2.8rem; font-weight: bold; margin: 25px 0; color: var(--primary); letter-spacing: 2px; }
-        
-        /* عرض الرسالة */
-        #messageDisplay { 
-            display: none; padding: 20px; border: 2px dashed var(--primary); 
-            border-radius: 15px; background: rgba(0,0,0,0.3); 
-            font-style: italic; font-size: 1.1rem; line-height: 1.6; word-wrap: break-word;
+        #timer-box { display: none; margin: 30px 0; }
+        .countdown-display {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            font-family: monospace;
+            text-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
         }
 
-        /* --- الفوتر واللوجو --- */
-        .footer-credit {
-            margin-top: 30px; padding-top: 15px;
+        /* رسالة التنبيه الصفراء */
+        .notice-card {
+            background: rgba(245, 158, 11, 0.1);
+            border-right: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+            display: none;
+        }
+        [dir="ltr"] .notice-card { border-right: none; border-left: 4px solid #f59e0b; }
+
+        /* الفوتر واللوجو */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
             border-top: 1px solid var(--border);
-            display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0.8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
         }
-        .footer-logo {
-            width: 40px; height: 40px; stroke: var(--primary);
-            filter: drop-shadow(0 0 8px var(--primary));
-            animation: floatLogo 3s ease-in-out infinite;
+
+        .logo-svg {
+            width: 45px;
+            height: 45px;
+            stroke: var(--primary);
+            filter: drop-shadow(0 0 10px var(--primary));
+            animation: float 4s ease-in-out infinite;
         }
-        @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        
-        .dev-name { font-size: 0.9rem; color: #aaa; margin: 0; }
-        .dev-name span { color: var(--primary); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .dev-tag { font-size: 0.8rem; opacity: 0.6; letter-spacing: 2px; }
+        .dev-tag span { color: var(--primary); font-weight: bold; }
+
+        /* رسالة النجاح */
+        #final-msg {
+            display: none;
+            padding: 25px;
+            border: 2px dashed var(--primary);
+            border-radius: 20px;
+            background: rgba(56, 189, 248, 0.05);
+            margin-top: 20px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
     </style>
 </head>
-<body id="bodyTag">
+<body id="body">
 
-    <div class="stars"></div>
+    <div class="stars-container"><div class="stars"></div></div>
 
     <div class="container">
-        <div class="toolbar">
-            <select id="langSelect" onchange="changeLang(this.value)">
+        <div class="header-tools">
+            <select class="lang-btn" id="langSwitch" onchange="updateLanguage(this.value)">
                 <option value="ar">العربية</option>
                 <option value="en">English</option>
             </select>
-            <div style="display:flex; gap: 8px;">
-                <button class="theme-btn" style="background:#38bdf8; width:25px; height:25px; padding:0;" onclick="setTheme('default')"></button>
-                <button class="theme-btn" style="background:#a855f7; width:25px; height:25px; padding:0;" onclick="setTheme('purple')"></button>
-                <button class="theme-btn" style="background:#22c55e; width:25px; height:25px; padding:0;" onclick="setTheme('green')"></button>
+            <div style="display:flex; gap: 10px;">
+                <div class="theme-swatch" style="background:#38bdf8" onclick="applyTheme('default')"></div>
+                <div class="theme-swatch" style="background:#a855f7" onclick="applyTheme('purple')"></div>
+                <div class="theme-swatch" style="background:#22c55e" onclick="applyTheme('green')"></div>
             </div>
         </div>
 
-        <h1 id="title">كبسولة الزمن 🚀</h1>
+        <h1 id="ui-title">كبسولة الزمن 🚀</h1>
 
-        <div id="step1">
-            <p id="p1">أدخل بريدك الإلكتروني المستهدف:</p>
-            <input type="email" id="emailInput" placeholder="example@gmail.com">
-            <button onclick="saveEmail()" id="btn1">ابدأ الرحلة 👨‍🚀</button>
+        <div id="view-setup">
+            <div class="notice-card" id="ui-notice">
+                ⚠️ هام: إذا كانت هذه مرتك الأولى، يرجى تفعيل بريدك عبر رسالة Verify التي ستصلك الآن لضمان استلام الكبسولة.
+            </div>
+            <div class="input-group">
+                <label id="ui-label-mail">بريدك الإلكتروني:</label>
+                <input type="email" id="userMail" placeholder="name@domain.com">
+            </div>
+            <button class="btn-main" onclick="handleMailStep()" id="ui-btn-next">متابعة الرحلة 👨‍🚀</button>
         </div>
 
-        <div id="step2" style="display:none;">
-            <p id="p2">اكتب رسالة للمستقبل:</p>
-            <textarea id="noteInput" class="hidden-note" placeholder="..." rows="4" onfocus="this.classList.remove('hidden-note')" onblur="this.classList.add('hidden-note')"></textarea>
-            <input type="datetime-local" id="dateInput">
-            <button onclick="lockCapsule()" id="btn2">قفل الكبسولة 🔒</button>
+        <div id="view-lock" style="display:none;">
+            <div class="input-group">
+                <label id="ui-label-note">رسالتك للمستقبل:</label>
+                <textarea id="userNote" class="hidden-content" rows="4" placeholder="..." onfocus="this.classList.remove('hidden-content')" onblur="this.classList.add('hidden-content')"></textarea>
+            </div>
+            <div class="input-group">
+                <label id="ui-label-date">موعد فتح الكبسولة:</label>
+                <input type="datetime-local" id="unlockDate">
+            </div>
+            <button class="btn-main" onclick="handleLockStep()" id="ui-btn-lock">قفل وإرسال للمدار 🔒</button>
         </div>
 
-        <div id="step3" style="display:none;">
-            <p id="p3">سيتم الفتح والإرسال تلقائياً بعد:</p>
-            <div id="countdown">00:00:00</div>
-            <div id="messageDisplay"></div>
-            <button onclick="resetAll()" id="btnReset" style="display:none; background:#ef4444; color:white;">إنشاء كبسولة جديدة 🔄</button>
+        <div id="timer-box">
+            <p id="ui-status">الكبسولة في طريقها للمستقبل...</p>
+            <div class="countdown-display" id="clock">00:00:00</div>
+            <div id="final-msg"></div>
+            <button class="btn-main" id="reset-btn" style="display:none; background:#ef4444; color:white;" onclick="clearAllData()">بدء رحلة جديدة 🔄</button>
         </div>
 
-        <div class="footer-credit">
-            <svg class="footer-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <div class="footer">
+            <svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.85 1.85 0 0 0 .2-1y6 6 0 1 0-11.6 4 6.06 6.06 0 0 0-1.6.2"></path>
-                <path d="M2 12h.01"></path>
-                <path d="M22 12h.01"></path>
-                <path d="M12 2v.01"></path>
-                <path d="M12 22v.01"></path>
-                <circle cx="12" cy="12" r="10" stroke-opacity="0.3"></circle>
+                <circle cx="12" cy="12" r="10" stroke-opacity="0.2"></circle>
             </svg>
-            <p class="dev-name">Developed by <span>Youcef baha eddine</span></p>
+            <p class="dev-tag">DESIGNED BY <span>YOUSSEF</span></p>
         </div>
     </div>
 
     <script>
-        // مفتاح Web3Forms الخاص بك
-        const API_KEY = "33abda0d-9a62-43ba-bdd4-a1d4a62c8567"; 
+        // مفتاحك الخاص
+        const WEB3_KEY = "33abda0d-9a62-43ba-bdd4-a1d4a62c8567";
 
-        const texts = {
-            ar: { title: "كبسولة الزمن 🚀", p1: "أدخل بريدك الإلكتروني المستهدف:", btn1: "ابدأ الرحلة 👨‍🚀", p2: "اكتب رسالة للمستقبل:", btn2: "قفل الكبسولة 🔒", p3: "سيتم الفتح والإرسال تلقائياً بعد:", reset: "إنشاء كبسولة جديدة 🔄", msgLock: "تم قفل كبسولتك بنجاح!", alertErr: "البريد غير صحيح", alertFill: "أكمل البيانات" },
-            en: { title: "Time Capsule 🚀", p1: "Enter target email address:", btn1: "Start Journey 👨‍🚀", p2: "Write to the future:", btn2: "Lock Capsule 🔒", p3: "Auto-unlocking in:", reset: "Create New Capsule 🔄", msgLock: "Capsule Locked Successfully!", alertErr: "Invalid Email", alertFill: "Fill all fields" }
+        // نصوص اللغات
+        const dictionary = {
+            ar: {
+                title: "كبسولة الزمن 🚀",
+                labelMail: "بريدك الإلكتروني:",
+                btnNext: "متابعة الرحلة 👨‍🚀",
+                labelNote: "رسالتك للمستقبل:",
+                labelDate: "موعد فتح الكبسولة:",
+                btnLock: "قفل وإرسال للمدار 🔒",
+                status: "سيتم فتح الكبسولة خلال:",
+                notice: "⚠️ هام: لمرة واحدة فقط، ستحتاج لتفعيل بريدك عبر رسالة Verify ستصلك الآن.",
+                alertMail: "يرجى كتابة إيميل صحيح",
+                alertData: "يرجى إكمال الرسالة والوقت",
+                mailSubject: "🚀 تم قفل كبسولتك بنجاح!",
+                mailBody: "رسالتك مؤمنة الآن. إذا لم تصلك رسائلنا، تفقد الـ Spam واضغط Verify."
+            },
+            en: {
+                title: "Time Capsule 🚀",
+                labelMail: "Your Email Address:",
+                btnNext: "Continue Mission 👨‍🚀",
+                labelNote: "Message to the Future:",
+                labelDate: "Unlock Date & Time:",
+                btnLock: "Lock & Launch 🔒",
+                status: "Capsule unlocks in:",
+                notice: "⚠️ Note: For the first time, you must verify your email via the link sent to you.",
+                alertMail: "Please enter a valid email",
+                alertData: "Please fill message and date",
+                mailSubject: "🚀 Capsule Locked Successfully!",
+                mailBody: "Your message is safe. If you don't see our emails, check Spam and click Verify."
+            }
         };
 
-        let currentLang = localStorage.getItem('capsule_lang') || 'ar';
-        let currentTheme = localStorage.getItem('capsule_theme') || 'default';
+        let currentLang = localStorage.getItem('lang') || 'ar';
 
-        // تطبيق الإعدادات المحفوظة عند التحميل
-        document.getElementById('langSelect').value = currentLang;
-        changeLang(currentLang);
-        setTheme(currentTheme);
-
-        function changeLang(l) {
-            currentLang = l;
-            localStorage.setItem('capsule_lang', l);
-            document.getElementById('htmlTag').dir = (l === 'ar' ? 'rtl' : 'ltr');
-            document.getElementById('title').innerText = texts[l].title;
-            document.getElementById('p1').innerText = texts[l].p1;
-            document.getElementById('btn1').innerText = texts[l].btn1;
-            document.getElementById('p2').innerText = texts[l].p2;
-            document.getElementById('btn2').innerText = texts[l].btn2;
-            document.getElementById('p3').innerText = texts[l].p3;
-            document.getElementById('btnReset').innerText = texts[l].reset;
-        }
-
-        function setTheme(t) {
-            currentTheme = t;
-            localStorage.setItem('capsule_theme', t);
-            document.getElementById('bodyTag').className = (t === 'default' ? '' : 'theme-' + t);
-        }
-
-        function saveEmail() {
-            const m = document.getElementById('emailInput').value;
-            if(m.includes('@')) { 
-                localStorage.setItem('u_mail', m); 
-                updateUI(); 
-            } else { 
-                alert(texts[currentLang].alertErr); 
-            }
-        }
-
-        function lockCapsule() {
-            const d = document.getElementById('dateInput').value;
-            const n = document.getElementById('noteInput').value;
-            if(!d || !n) return alert(texts[currentLang].alertFill);
-
-            localStorage.setItem('u_time', new Date(d).getTime());
-            localStorage.setItem('u_note', n);
+        // 1. إدارة اللغات
+        function updateLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            const d = dictionary[lang];
             
-            // إرسال إيميل تأكيد القفل
-            sendMail(texts[currentLang].msgLock, "رسالتك مؤمنة في الفضاء الزمني وسيتم إرسالها لك فور انتهاء العداد.");
-            updateUI();
+            document.getElementById('htmlTag').dir = (lang === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('ui-title').innerText = d.title;
+            document.getElementById('ui-label-mail').innerText = d.labelMail;
+            document.getElementById('ui-btn-next').innerText = d.btnNext;
+            document.getElementById('ui-label-note').innerText = d.labelNote;
+            document.getElementById('ui-label-date').innerText = d.labelDate;
+            document.getElementById('ui-btn-lock').innerText = d.btnLock;
+            document.getElementById('ui-status').innerText = d.status;
+            document.getElementById('ui-notice').innerText = d.notice;
         }
 
-        function updateUI() {
-            const m = localStorage.getItem('u_mail');
-            const t = localStorage.getItem('u_time');
-            
-            if(m && !t) { 
-                document.getElementById('step1').style.display='none'; 
-                document.getElementById('step2').style.display='block'; 
-                document.getElementById('step3').style.display='none';
-            }
-            else if(m && t) { 
-                document.getElementById('step1').style.display='none'; 
-                document.getElementById('step2').style.display='none'; 
-                document.getElementById('step3').style.display='block';
-                startTimer();
+        // 2. إدارة الثيمات
+        function applyTheme(theme) {
+            document.getElementById('body').className = (theme === 'default' ? '' : 'theme-' + theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        // 3. منطق الخطوة الأولى (الإيميل)
+        function handleMailStep() {
+            const mail = document.getElementById('userMail').value;
+            if (mail.includes('@')) {
+                localStorage.setItem('email', mail);
+                document.getElementById('ui-notice').style.display = 'block';
+                refreshUI();
             } else {
-                document.getElementById('step1').style.display='block';
-                document.getElementById('step2').style.display='none';
-                document.getElementById('step3').style.display='none';
+                alert(dictionary[currentLang].alertMail);
             }
         }
 
-        function startTimer() {
-            const itv = setInterval(() => {
-                const diff = localStorage.getItem('u_time') - new Date().getTime();
-                
-                if(diff <= 0) {
-                    clearInterval(itv);
-                    // التحقق من أن الرسالة لم تفتح من قبل لتجنب التكرار
-                    if(!sessionStorage.getItem('isRevealed')) { 
-                        sessionStorage.setItem('isRevealed', 'true');
-                        reveal(); 
+        // 4. منطق الخطوة الثانية (القفل)
+        async function handleLockStep() {
+            const note = document.getElementById('userNote').value;
+            const date = document.getElementById('unlockDate').value;
+
+            if (!note || !date) {
+                alert(dictionary[currentLang].alertData);
+                return;
+            }
+
+            const timestamp = new Date(date).getTime();
+            localStorage.setItem('note', note);
+            localStorage.setItem('time', timestamp);
+
+            // إرسال إيميل القفل
+            await triggerEmail(dictionary[currentLang].mailSubject, dictionary[currentLang].mailBody);
+            refreshUI();
+        }
+
+        // 5. العداد والفتح التلقائي
+        function initCountdown() {
+            const target = parseInt(localStorage.getItem('time'));
+            
+            const timer = setInterval(async () => {
+                const now = new Date().getTime();
+                const diff = target - now;
+
+                if (diff <= 0) {
+                    clearInterval(timer);
+                    if (!sessionStorage.getItem('opened')) {
+                        sessionStorage.setItem('opened', 'true');
+                        executeUnlock();
                     } else {
-                        // إذا كانت مفتوحة بالفعل، فقط نعرض المحتوى دون إرسال إيميل
-                        showContentOnly();
+                        displayMessageOnly();
                     }
                 } else {
                     const h = Math.floor(diff / 3600000);
                     const m = Math.floor((diff % 3600000) / 60000);
                     const s = Math.floor((diff % 60000) / 1000);
-                    document.getElementById('countdown').innerHTML = 
-                        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                    document.getElementById('clock').innerText = 
+                        `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
                 }
             }, 1000);
         }
 
-        function reveal() {
-            showContentOnly();
-            const n = localStorage.getItem('u_note');
-            // إرسال الإيميل النهائي
-            sendMail("🔓 فُتحت كبسولتك الزمنية الآن!", "محتوى الرسالة التي أرسلتها من الماضي: \n\n" + n);
+        async function executeUnlock() {
+            displayMessageOnly();
+            const note = localStorage.getItem('note');
+            await triggerEmail("🔓 فُتحت الكبسولة الآن!", "إليك رسالتك التي انتظرتها: \n\n" + note);
         }
 
-        function showContentOnly() {
-            const n = localStorage.getItem('u_note');
-            document.getElementById('countdown').style.display = 'none';
-            document.getElementById('p3').style.display = 'none';
-            document.getElementById('messageDisplay').style.display = 'block';
-            document.getElementById('messageDisplay').innerText = `"${n}"`;
-            document.getElementById('btnReset').style.display = 'block';
+        function displayMessageOnly() {
+            document.getElementById('clock').style.display = 'none';
+            document.getElementById('ui-status').style.display = 'none';
+            const box = document.getElementById('final-msg');
+            box.style.display = 'block';
+            box.innerText = `"${localStorage.getItem('note')}"`;
+            document.getElementById('reset-btn').style.display = 'block';
         }
 
-        async function sendMail(sub, msg) {
+        // 6. خدمة الإرسال
+        async function triggerEmail(subject, message) {
             try {
                 await fetch('https://api.web3forms.com/submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        access_key: API_KEY,
-                        email: localStorage.getItem('u_mail'), // الإرسال للإيميل المدخل
-                        subject: sub,
-                        message: msg,
-                        from_name: "Time Capsule Bot"
+                        access_key: WEB3_KEY,
+                        email: localStorage.getItem('email'),
+                        subject: subject,
+                        message: message,
+                        from_name: "Time Capsule"
                     })
                 });
-                console.log("Email Sent via Web3Forms");
-            } catch (e) { console.error("Mail Error", e); }
+            } catch (err) { console.error("Email error:", err); }
         }
 
-        function resetAll() { 
-            localStorage.clear(); 
+        // 7. تحديث واجهة المستخدم
+        function refreshUI() {
+            const email = localStorage.getItem('email');
+            const time = localStorage.getItem('time');
+
+            if (email && !time) {
+                document.getElementById('view-setup').style.display = 'none';
+                document.getElementById('view-lock').style.display = 'block';
+            } else if (email && time) {
+                document.getElementById('view-setup').style.display = 'none';
+                document.getElementById('view-lock').style.display = 'none';
+                document.getElementById('timer-box').style.display = 'block';
+                initCountdown();
+            }
+        }
+
+        function clearAllData() {
+            localStorage.clear();
             sessionStorage.clear();
-            location.reload(); 
+            location.reload();
         }
 
-        // تفاعل أولي وهمي لضمان عمل المتصفح بشكل سليم
-        document.body.addEventListener('click', () => {}, {once: true});
-        
-        // تشغيل التحقق عند البدء
-        updateUI();
+        // التشغيل الأولي
+        updateLanguage(currentLang);
+        applyTheme(localStorage.getItem('theme') || 'default');
+        refreshUI();
     </script>
 </body>
 </html>
