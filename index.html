@@ -11,6 +11,7 @@
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.1);
         }
+        /* ثيمات الألوان */
         .theme-purple { --primary: #a855f7; --bg: #1e1b4b; }
         .theme-green { --primary: #22c55e; --bg: #052e16; }
 
@@ -18,10 +19,10 @@
             background-color: var(--bg); color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0; height: 100vh; display: flex; align-items: center;
-            justify-content: center; overflow: hidden; transition: 0.5s;
+            justify-content: center; overflow: hidden; transition: background-color 0.5s ease;
         }
 
-        /* تأثير النجوم المتحركة */
+        /* خلفية النجوم المتحركة */
         .stars {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
@@ -32,46 +33,40 @@
         }
         @keyframes moveStars { from { transform: translateY(0); } to { transform: translateY(-1000px); } }
 
+        /* حاوية الكبسولة الزجاجية */
         .container {
-            background: var(--glass); backdrop-filter: blur(20px);
+            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             padding: 2.5rem; border-radius: 30px; border: 1px solid var(--border);
-            width: 90%; max-width: 400px; text-align: center;
+            width: 90%; max-width: 420px; text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative;
-            <div class="footer-credit">
-            <svg class="footer-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.85 1.85 0 0 0 .2-1y6 6 0 1 0-11.6 4 6.06 6.06 0 0 0-1.6.2"></path>
-                <path d="M2 12h.01"></path>
-                <path d="M22 12h.01"></path>
-                <path d="M12 2v.01"></path>
-                <path d="M12 22v.01"></path>
-                <circle cx="12" cy="12" r="10" stroke-opacity="0.3"></circle>
-            </svg>
-            
-            <p class="dev-name">Developed by <span>Youssef</span></p>
-        </div>
-        ```
-
-ضع هذا الكود، وسيكون لديك لوجو يتحرك بحركة طفو خفيفة، يتوهج، ويغير لونه حسب الثيم الذي يختاره المستخدم!
+            display: flex; flex-direction: column; justify-content: space-between;
         }
 
-        .toolbar { position: absolute; top: -55px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        /* شريط الأدوات العلوي */
+        .toolbar { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 20px;
+        }
         select, .theme-btn { 
             background: var(--glass); border: 1px solid var(--border); color: white; 
-            padding: 8px 12px; border-radius: 12px; cursor: pointer; outline: none;
+            padding: 8px 12px; border-radius: 12px; cursor: pointer; outline: none; transition: 0.3s;
         }
+        select:hover, .theme-btn:hover { background: rgba(255,255,255,0.1); }
 
-        h1 { font-size: 1.8rem; margin-bottom: 1rem; color: var(--primary); text-shadow: 0 0 15px var(--primary); }
+        h1 { font-size: 1.8rem; margin: 10px 0 20px 0; color: var(--primary); text-shadow: 0 0 15px var(--primary); }
         
+        /* حقول الإدخال */
         input, textarea {
             width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px;
             border: 1px solid var(--border); background: rgba(0,0,0,0.4);
             color: white; box-sizing: border-box; outline: none; transition: 0.3s;
+            font-family: inherit;
         }
         input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
 
         .hidden-note { -webkit-text-security: disc; }
 
+        /* الأزرار */
         button {
             background: var(--primary); color: #000; border: none;
             padding: 16px; border-radius: 50px; cursor: pointer;
@@ -80,50 +75,31 @@
         }
         button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px var(--primary); opacity: 0.9; }
 
+        /* العداد */
         #countdown { font-size: 2.8rem; font-weight: bold; margin: 25px 0; color: var(--primary); letter-spacing: 2px; }
-        #messageDisplay { display: none; padding: 20px; border: 2px dashed var(--primary); border-radius: 15px; background: rgba(0,0,0,0.3); font-style: italic; font-size: 1.1rem; line-height: 1.6; }
-        /* تنسيقات الفوتر واللوجو */
-.footer-credit {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    opacity: 0.7;
-    transition: opacity 0.3s;
-}
+        
+        /* عرض الرسالة */
+        #messageDisplay { 
+            display: none; padding: 20px; border: 2px dashed var(--primary); 
+            border-radius: 15px; background: rgba(0,0,0,0.3); 
+            font-style: italic; font-size: 1.1rem; line-height: 1.6; word-wrap: break-word;
+        }
 
-.footer-credit:hover {
-    opacity: 1; /* يضيء عند تمرير الماوس */
-}
-
-.footer-logo {
-    width: 40px;
-    height: 40px;
-    stroke: var(--primary); /* يأخذ لون الثيم تلقائياً */
-    filter: drop-shadow(0 0 8px var(--primary)); /* توهج */
-    animation: floatLogo 3s ease-in-out infinite;
-}
-
-@keyframes floatLogo {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-.dev-name {
-    font-size: 0.9rem;
-    color: white;
-    font-weight: 300;
-}
-
-.dev-name span {
-    color: var(--primary);
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
+        /* --- الفوتر واللوجو --- */
+        .footer-credit {
+            margin-top: 30px; padding-top: 15px;
+            border-top: 1px solid var(--border);
+            display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0.8;
+        }
+        .footer-logo {
+            width: 40px; height: 40px; stroke: var(--primary);
+            filter: drop-shadow(0 0 8px var(--primary));
+            animation: floatLogo 3s ease-in-out infinite;
+        }
+        @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        
+        .dev-name { font-size: 0.9rem; color: #aaa; margin: 0; }
+        .dev-name span { color: var(--primary); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body id="bodyTag">
@@ -137,9 +113,9 @@
                 <option value="en">English</option>
             </select>
             <div style="display:flex; gap: 8px;">
-                <button class="theme-btn" style="background:#38bdf8" onclick="setTheme('default')"></button>
-                <button class="theme-btn" style="background:#a855f7" onclick="setTheme('purple')"></button>
-                <button class="theme-btn" style="background:#22c55e" onclick="setTheme('green')"></button>
+                <button class="theme-btn" style="background:#38bdf8; width:25px; height:25px; padding:0;" onclick="setTheme('default')"></button>
+                <button class="theme-btn" style="background:#a855f7; width:25px; height:25px; padding:0;" onclick="setTheme('purple')"></button>
+                <button class="theme-btn" style="background:#22c55e; width:25px; height:25px; padding:0;" onclick="setTheme('green')"></button>
             </div>
         </div>
 
@@ -153,7 +129,7 @@
 
         <div id="step2" style="display:none;">
             <p id="p2">اكتب رسالة للمستقبل:</p>
-            <textarea id="noteInput" class="hidden-note" placeholder="..." onfocus="this.classList.remove('hidden-note')" onblur="this.classList.add('hidden-note')"></textarea>
+            <textarea id="noteInput" class="hidden-note" placeholder="..." rows="4" onfocus="this.classList.remove('hidden-note')" onblur="this.classList.add('hidden-note')"></textarea>
             <input type="datetime-local" id="dateInput">
             <button onclick="lockCapsule()" id="btn2">قفل الكبسولة 🔒</button>
         </div>
@@ -164,21 +140,41 @@
             <div id="messageDisplay"></div>
             <button onclick="resetAll()" id="btnReset" style="display:none; background:#ef4444; color:white;">إنشاء كبسولة جديدة 🔄</button>
         </div>
+
+        <div class="footer-credit">
+            <svg class="footer-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.85 1.85 0 0 0 .2-1y6 6 0 1 0-11.6 4 6.06 6.06 0 0 0-1.6.2"></path>
+                <path d="M2 12h.01"></path>
+                <path d="M22 12h.01"></path>
+                <path d="M12 2v.01"></path>
+                <path d="M12 22v.01"></path>
+                <circle cx="12" cy="12" r="10" stroke-opacity="0.3"></circle>
+            </svg>
+            <p class="dev-name">Developed by <span>Youcef baha eddine</span></p>
+        </div>
     </div>
 
     <script>
-        // دمج مفتاحك الخاص هنا مباشرة
+        // مفتاح Web3Forms الخاص بك
         const API_KEY = "33abda0d-9a62-43ba-bdd4-a1d4a62c8567"; 
 
         const texts = {
-            ar: { title: "كبسولة الزمن 🚀", p1: "أدخل بريدك الإلكتروني المستهدف:", btn1: "ابدأ الرحلة 👨‍🚀", p2: "اكتب رسالة للمستقبل:", btn2: "قفل الكبسولة 🔒", p3: "سيتم الفتح والإرسال تلقائياً بعد:", reset: "إنشاء كبسولة جديدة 🔄", msgLock: "تم قفل كبسولتك بنجاح!" },
-            en: { title: "Time Capsule 🚀", p1: "Enter target email address:", btn1: "Start Journey 👨‍🚀", p2: "Write to the future:", btn2: "Lock Capsule 🔒", p3: "Auto-unlocking in:", reset: "Create New Capsule 🔄", msgLock: "Capsule Locked Successfully!" }
+            ar: { title: "كبسولة الزمن 🚀", p1: "أدخل بريدك الإلكتروني المستهدف:", btn1: "ابدأ الرحلة 👨‍🚀", p2: "اكتب رسالة للمستقبل:", btn2: "قفل الكبسولة 🔒", p3: "سيتم الفتح والإرسال تلقائياً بعد:", reset: "إنشاء كبسولة جديدة 🔄", msgLock: "تم قفل كبسولتك بنجاح!", alertErr: "البريد غير صحيح", alertFill: "أكمل البيانات" },
+            en: { title: "Time Capsule 🚀", p1: "Enter target email address:", btn1: "Start Journey 👨‍🚀", p2: "Write to the future:", btn2: "Lock Capsule 🔒", p3: "Auto-unlocking in:", reset: "Create New Capsule 🔄", msgLock: "Capsule Locked Successfully!", alertErr: "Invalid Email", alertFill: "Fill all fields" }
         };
 
-        let currentLang = 'ar';
+        let currentLang = localStorage.getItem('capsule_lang') || 'ar';
+        let currentTheme = localStorage.getItem('capsule_theme') || 'default';
+
+        // تطبيق الإعدادات المحفوظة عند التحميل
+        document.getElementById('langSelect').value = currentLang;
+        changeLang(currentLang);
+        setTheme(currentTheme);
 
         function changeLang(l) {
             currentLang = l;
+            localStorage.setItem('capsule_lang', l);
             document.getElementById('htmlTag').dir = (l === 'ar' ? 'rtl' : 'ltr');
             document.getElementById('title').innerText = texts[l].title;
             document.getElementById('p1').innerText = texts[l].p1;
@@ -190,22 +186,30 @@
         }
 
         function setTheme(t) {
+            currentTheme = t;
+            localStorage.setItem('capsule_theme', t);
             document.getElementById('bodyTag').className = (t === 'default' ? '' : 'theme-' + t);
         }
 
         function saveEmail() {
             const m = document.getElementById('emailInput').value;
-            if(m.includes('@')) { localStorage.setItem('u_mail', m); updateUI(); }
-            else { alert(currentLang === 'ar' ? "البريد غير صحيح" : "Invalid Email"); }
+            if(m.includes('@')) { 
+                localStorage.setItem('u_mail', m); 
+                updateUI(); 
+            } else { 
+                alert(texts[currentLang].alertErr); 
+            }
         }
 
         function lockCapsule() {
             const d = document.getElementById('dateInput').value;
             const n = document.getElementById('noteInput').value;
-            if(!d || !n) return alert(currentLang === 'ar' ? "أكمل البيانات" : "Fill all fields");
+            if(!d || !n) return alert(texts[currentLang].alertFill);
 
             localStorage.setItem('u_time', new Date(d).getTime());
             localStorage.setItem('u_note', n);
+            
+            // إرسال إيميل تأكيد القفل
             sendMail(texts[currentLang].msgLock, "رسالتك مؤمنة في الفضاء الزمني وسيتم إرسالها لك فور انتهاء العداد.");
             updateUI();
         }
@@ -213,21 +217,38 @@
         function updateUI() {
             const m = localStorage.getItem('u_mail');
             const t = localStorage.getItem('u_time');
-            if(m && !t) { document.getElementById('step1').style.display='none'; document.getElementById('step2').style.display='block'; }
+            
+            if(m && !t) { 
+                document.getElementById('step1').style.display='none'; 
+                document.getElementById('step2').style.display='block'; 
+                document.getElementById('step3').style.display='none';
+            }
             else if(m && t) { 
                 document.getElementById('step1').style.display='none'; 
                 document.getElementById('step2').style.display='none'; 
                 document.getElementById('step3').style.display='block';
                 startTimer();
+            } else {
+                document.getElementById('step1').style.display='block';
+                document.getElementById('step2').style.display='none';
+                document.getElementById('step3').style.display='none';
             }
         }
 
         function startTimer() {
             const itv = setInterval(() => {
                 const diff = localStorage.getItem('u_time') - new Date().getTime();
+                
                 if(diff <= 0) {
                     clearInterval(itv);
-                    if(!window.isDone) { window.isDone=true; reveal(); }
+                    // التحقق من أن الرسالة لم تفتح من قبل لتجنب التكرار
+                    if(!sessionStorage.getItem('isRevealed')) { 
+                        sessionStorage.setItem('isRevealed', 'true');
+                        reveal(); 
+                    } else {
+                        // إذا كانت مفتوحة بالفعل، فقط نعرض المحتوى دون إرسال إيميل
+                        showContentOnly();
+                    }
                 } else {
                     const h = Math.floor(diff / 3600000);
                     const m = Math.floor((diff % 3600000) / 60000);
@@ -239,13 +260,19 @@
         }
 
         function reveal() {
+            showContentOnly();
+            const n = localStorage.getItem('u_note');
+            // إرسال الإيميل النهائي
+            sendMail("🔓 فُتحت كبسولتك الزمنية الآن!", "محتوى الرسالة التي أرسلتها من الماضي: \n\n" + n);
+        }
+
+        function showContentOnly() {
             const n = localStorage.getItem('u_note');
             document.getElementById('countdown').style.display = 'none';
             document.getElementById('p3').style.display = 'none';
             document.getElementById('messageDisplay').style.display = 'block';
             document.getElementById('messageDisplay').innerText = `"${n}"`;
             document.getElementById('btnReset').style.display = 'block';
-            sendMail("🔓 فُتحت كبسولتك الزمنية الآن!", "محتوى الرسالة التي أرسلتها من الماضي: \n\n" + n);
         }
 
         async function sendMail(sub, msg) {
@@ -255,18 +282,27 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         access_key: API_KEY,
-                        email: localStorage.getItem('u_mail'),
+                        email: localStorage.getItem('u_mail'), // الإرسال للإيميل المدخل
                         subject: sub,
                         message: msg,
                         from_name: "Time Capsule Bot"
                     })
                 });
+                console.log("Email Sent via Web3Forms");
             } catch (e) { console.error("Mail Error", e); }
         }
 
-        function resetAll() { localStorage.clear(); location.reload(); }
+        function resetAll() { 
+            localStorage.clear(); 
+            sessionStorage.clear();
+            location.reload(); 
+        }
+
+        // تفاعل أولي وهمي لضمان عمل المتصفح بشكل سليم
+        document.body.addEventListener('click', () => {}, {once: true});
+        
+        // تشغيل التحقق عند البدء
         updateUI();
     </script>
 </body>
 </html>
-
