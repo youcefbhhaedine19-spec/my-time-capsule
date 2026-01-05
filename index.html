@@ -387,33 +387,37 @@
             }, 1000);
         }
 
-        async function finalizeMission() {
-            sessionStorage.setItem('notified', 'true');
-            const d = TXT[currentLang];
-            const note = localStorage.getItem('app_note');
+async function finalizeMission() {
+    sessionStorage.setItem('notified', 'true');
+    const d = TXT[currentLang];
+    const note = localStorage.getItem('app_note');
+    const targetEmail = localStorage.getItem('tmp_mail');
 
-            document.getElementById('clock').innerText = "DONE ✅";
-            document.getElementById('pBar').style.width = "100%";
-            document.getElementById('final-content').style.display = 'block';
-            document.getElementById('final-content').innerText = `"${note}"`;
-            document.getElementById('newMissionBtn').style.display = 'flex';
+    // تحديث واجهة الموقع للمستخدم
+    document.getElementById('clock').innerText = "DONE ✅";
+    document.getElementById('final-content').style.display = 'block';
+    document.getElementById('final-content').innerText = `"${note}"`;
+    document.getElementById('newMissionBtn').style.display = 'flex';
 
-            const params = {
-                user_email: localStorage.getItem('tmp_mail'),
-                subject_line: d.sub,
-                email_greeting: d.hi,
-                email_body: d.body,
-                message: note,
-                email_footer: d.foot
-            };
+    // هذه البيانات ترسل إلى EmailJS لتعبئة القالب في صورتك
+    const params = {
+        user_email: targetEmail,      // يطابق {{user_email}} في صورتك
+        subject_line: d.sub,          // يطابق {{subject_line}} في صورتك
+        from_name: "Time Capsule",    // يطابق {{from_name}}
+        email_greeting: d.hi,         // يطابق {{email_greeting}}
+        email_body: d.body,           // يطابق {{email_body}}
+        message: note,                // يطابق {{message}}
+        email_footer: d.foot          // يطابق {{email_footer}}
+    };
 
-            try {
-                await emailjs.send(CFG.sid, CFG.tid, params);
-                console.log("Transmission complete.");
-            } catch (e) {
-                console.error("System Error:", e);
-            }
-        }
+    try {
+        // استخدام المعرفات الخاصة بك الموجودة في السجلات
+        await emailjs.send("service_ih7jn54", "template_oz29fcd", params);
+        console.log("تم الإرسال بنجاح إلى: " + targetEmail);
+    } catch (e) {
+        console.error("خطأ في النظام:", e);
+    }
+}
 
         function clearSystem() {
             if (confirm("Reset System? / إعادة ضبط؟")) {
@@ -432,3 +436,4 @@
     </script>
 </body>
 </html>
+
