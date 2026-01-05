@@ -1,439 +1,469 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="htmlTag">
+<html lang="ar" dir="rtl" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Capsule Elite | كبسولة الزمن الاحترافية</title>
+    <title>Time Capsule Genesis | كبسولة الزمن: التكوين</title>
     
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* --- المتغيرات والتنسيق العام --- */
-        :root { 
-            --primary: #38bdf8; 
-            --primary-glow: rgba(56, 189, 248, 0.5);
-            --bg: #020617; 
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --error: #ef4444;
-            --success: #22c55e;
+        :root {
+            --accent: #38bdf8;
+            --accent-rgb: 56, 189, 248;
+            --bg-deep: #020617;
+            --glass-bg: rgba(8, 15, 30, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
         }
 
-        .theme-purple { --primary: #a855f7; --primary-glow: rgba(168, 85, 247, 0.5); --bg: #0f172a; }
-        .theme-green { --primary: #10b981; --primary-glow: rgba(16, 185, 129, 0.5); --bg: #064e3b; }
+        .theme-nebula { --accent: #a855f7; --accent-rgb: 168, 85, 247; --bg-deep: #0f172a; }
+        .theme-forest { --accent: #10b981; --accent-rgb: 16, 185, 129; --bg-deep: #052e16; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background-color: var(--bg);
-            color: white;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             height: 100vh;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            perspective: 1000px;
         }
 
-        /* --- نظام خلفية الفضاء المتقدم --- */
-        #space-canvas {
+        /* --- Canvas Background --- */
+        #canvas-stars {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, #111827 0%, #020617 100%);
         }
 
-        .star-layer {
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background-image: 
-                radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 50px 70px, #fff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 150px 200px, #fff, rgba(0,0,0,0));
-            background-repeat: repeat;
-            animation: moveStars 180s linear infinite;
-            opacity: 0.4;
-        }
-
-        @keyframes moveStars {
-            from { transform: translate(0, 0); }
-            to { transform: translate(-20%, -20%); }
-        }
-
-        /* --- الحاوية الرئيسية --- */
-        .main-wrapper {
-            background: var(--glass);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            padding: 50px;
-            border-radius: 40px;
-            border: 1px solid var(--border);
-            width: 95%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+        /* --- Main Capsule Container --- */
+        .capsule-hull {
             position: relative;
-            transform: translateY(0);
-            transition: 0.5s;
+            width: 90%;
+            max-width: 550px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            padding: 50px;
+            box-shadow: 0 0 80px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
         }
 
-        /* --- أدوات التحكم --- */
-        .nav-bar {
+        /* --- UI Controls --- */
+        .system-tray {
+            position: absolute;
+            top: 25px;
+            width: calc(100% - 100px);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 35px;
         }
 
-        .btn-mini {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            color: #ccc;
-            padding: 8px 14px;
+        .sys-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-dim);
+            padding: 8px 15px;
             border-radius: 12px;
+            font-size: 12px;
             cursor: pointer;
-            font-size: 13px;
             transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .btn-mini:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+        .sys-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
 
-        .theme-dots { display: flex; gap: 10px; }
-        .dot { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.3s; }
-        .dot:hover { transform: scale(1.3); }
-        .dot.active { border-color: white; }
-
-        /* --- العناصر النصية --- */
+        /* --- Dynamic Typography --- */
         h1 {
-            font-size: 2.4rem;
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -2px;
             margin-bottom: 10px;
-            background: linear-gradient(to right, #fff, var(--primary));
+            background: linear-gradient(to bottom, #fff 30%, var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-weight: 800;
+            filter: drop-shadow(0 0 15px var(--accent-glow));
         }
 
-        .subtitle { font-size: 0.95rem; opacity: 0.6; margin-bottom: 30px; line-height: 1.5; }
+        .mission-status {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
 
-        /* --- النماذج والمدخلات --- */
-        .form-section { display: none; animation: fadeIn 0.6s ease-out forwards; }
-        .form-section.active { display: block; }
+        /* --- Interaction Sections --- */
+        .view-frame { display: none; opacity: 0; transform: translateY(30px) scale(0.95); }
+        .view-frame.active { display: block; opacity: 1; transform: translateY(0) scale(1); transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .input-wrap { text-align: right; margin-bottom: 20px; }
-        [dir="ltr"] .input-wrap { text-align: left; }
-
-        label { display: block; font-size: 0.85rem; margin-bottom: 8px; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-
-        input, textarea {
+        .orbit-input {
             width: 100%;
-            padding: 18px;
-            border-radius: 18px;
-            border: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.4);
-            color: white;
-            font-size: 1rem;
-            transition: 0.4s;
-            outline: none;
-        }
-
-        input:focus, textarea:focus {
-            border-color: var(--primary);
-            background: rgba(0, 0, 0, 0.6);
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        /* --- الأزرار --- */
-        .cta-button {
-            background: var(--primary);
-            color: #000;
-            border: none;
+            background: rgba(0,0,0,0.4);
+            border: 1.5px solid var(--glass-border);
+            border-radius: 20px;
             padding: 20px;
-            border-radius: 50px;
-            width: 100%;
-            font-weight: 800;
+            color: #fff;
             font-size: 1.1rem;
+            margin-bottom: 25px;
+            transition: 0.4s;
+        }
+
+        .orbit-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 25px rgba(var(--accent-rgb), 0.3);
+            background: rgba(0,0,0,0.6);
+        }
+
+        .master-trigger {
+            width: 100%;
+            padding: 22px;
+            border-radius: 100px;
+            border: none;
+            background: var(--accent);
+            color: #000;
+            font-weight: 900;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            margin-top: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(var(--accent-rgb), 0.4);
         }
 
-        .cta-button:hover { transform: translateY(-4px); box-shadow: 0 15px 30px var(--primary-glow); }
-        .cta-button:active { transform: translateY(0); }
+        .master-trigger:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(var(--accent-rgb), 0.6);
+        }
 
-        /* --- شاشة العداد --- */
-        .timer-display { margin: 40px 0; }
-        #clock { font-size: 4rem; font-weight: 900; font-family: 'Courier New', monospace; color: var(--primary); letter-spacing: -2px; }
-        
-        .progress-container { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-top: 20px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background: var(--primary); transition: 0.3s; }
+        /* --- Chronos Timer --- */
+        .chronos-box {
+            margin: 40px 0;
+            position: relative;
+        }
 
-        /* --- الرسالة النهائية --- */
-        #final-content {
-            display: none;
-            padding: 25px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px dashed var(--primary);
+        #timer-core {
+            font-size: 5rem;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            text-shadow: 0 0 30px rgba(var(--accent-rgb), 0.5);
+        }
+
+        .energy-rail {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
             margin-top: 20px;
-            font-size: 1.2rem;
-            line-height: 1.8;
-            color: #ddd;
+            overflow: hidden;
         }
 
-        /* --- الفوتر واللوجو --- */
-        .footer-logo { margin-top: 45px; border-top: 1px solid var(--border); padding-top: 25px; }
-        .ship-icon { width: 45px; fill: var(--primary); filter: drop-shadow(0 0 10px var(--primary)); animation: float 4s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-12px) rotate(5deg); } }
-        .brand { font-size: 12px; opacity: 0.4; letter-spacing: 3px; margin-top: 10px; }
-        .brand span { color: var(--primary); font-weight: bold; opacity: 1; }
-
-        /* --- استعلامات الوسائط --- */
-        @media (max-width: 480px) {
-            .main-wrapper { padding: 30px; }
-            h1 { font-size: 1.8rem; }
-            #clock { font-size: 3rem; }
+        .energy-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
         }
+
+        /* --- Result Shield --- */
+        #decrypted-data {
+            display: none;
+            padding: 30px;
+            border: 1px solid var(--accent);
+            border-radius: 25px;
+            background: rgba(var(--accent-rgb), 0.05);
+            margin: 25px 0;
+            font-size: 1.4rem;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        /* --- Branding --- */
+        .footer-core {
+            margin-top: 50px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .rocket-glyph {
+            font-size: 2.5rem;
+            color: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
+
+        .creator-id {
+            font-size: 10px;
+            letter-spacing: 8px;
+            margin-top: 15px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .creator-id span { color: var(--accent); font-weight: bold; }
     </style>
 </head>
-<body id="masterBody">
+<body id="masterContainer">
 
-    <div id="space-canvas"><div class="star-layer"></div></div>
+    <canvas id="canvas-stars"></canvas>
 
-    <div class="main-wrapper" id="mainCard">
-        <div class="nav-bar">
-            <select class="btn-mini" id="langSwitch" onchange="toggleLang(this.value)">
+    <div class="capsule-hull" id="mainHull">
+        <div class="system-tray">
+            <select class="sys-btn" id="langNode" onchange="syncLanguage(this.value)">
                 <option value="ar">العربية</option>
                 <option value="en">English</option>
             </select>
-            <div class="theme-dots">
-                <div class="dot active" style="background: #38bdf8;" onclick="updateTheme('default', this)"></div>
-                <div class="dot" style="background: #a855f7;" onclick="updateTheme('purple', this)"></div>
-                <div class="dot" style="background: #10b981;" onclick="updateTheme('green', this)"></div>
+            <div style="display:flex; gap: 8px;">
+                <button class="sys-btn" onclick="toggleTheme('nebula')"><i class="fas fa-atom"></i></button>
+                <button class="sys-btn" onclick="toggleTheme('forest')"><i class="fas fa-leaf"></i></button>
+                <button class="sys-btn" onclick="toggleTheme('default')"><i class="fas fa-sun"></i></button>
             </div>
         </div>
 
-        <h1 id="ui-title">كبسولة الزمن 🚀</h1>
-        <p class="subtitle" id="ui-subtitle">سجل رسالتك الآن، وسنقوم بتوصيلها لك في المستقبل عبر الفضاء الإلكتروني.</p>
+        <div style="margin-top: 30px;">
+            <h1 id="ui-title">GENESIS</h1>
+            <p class="mission-status" id="ui-subtitle">SECURE TEMPORAL TRANSMISSION SYSTEM</p>
+        </div>
 
-        <div id="sec-1" class="form-section active">
-            <div class="input-wrap">
-                <label id="ui-l-mail">بريد المستلم</label>
-                <input type="email" id="emailInput" placeholder="name@domain.com">
-            </div>
-            <button class="cta-button" onclick="nextSection(2)">
-                <span id="ui-btn-1">بدء المهمة</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <div id="v-1" class="view-frame active">
+            <input type="email" id="targetEmail" class="orbit-input" placeholder="RECIPIENT_PROTOCOL@MAIL.COM">
+            <button class="master-trigger" onclick="switchView(2)">
+                <span id="ui-btn-1">INITIALIZE LINK</span>
+                <i class="fas fa-bolt"></i>
             </button>
         </div>
 
-        <div id="sec-2" class="form-section">
-            <div class="input-wrap">
-                <label id="ui-l-note">رسالتك السرية</label>
-                <textarea id="noteInput" rows="4" placeholder="اكتب شيئاً تود قراءته بعد سنوات..."></textarea>
-            </div>
-            <div class="input-wrap">
-                <label id="ui-l-date">موعد فتح الكبسولة</label>
-                <input type="datetime-local" id="dateInput">
-            </div>
-            <button class="cta-button" onclick="lockAndLaunch()">
-                <span id="ui-btn-2">إطلاق إلى المدار</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M2 12h20M12 2l4 4-4-4zm0 20l-4-4 4 4z"/></svg>
+        <div id="v-2" class="view-frame">
+            <textarea id="dataStream" class="orbit-input" rows="4" placeholder="ENTER TEMPORAL MESSAGE..."></textarea>
+            <input type="datetime-local" id="temporalNode" class="orbit-input">
+            <button class="master-trigger" onclick="engageLock()">
+                <span id="ui-btn-2">ENGAGE QUANTUM LOCK</span>
+                <i class="fas fa-lock"></i>
             </button>
         </div>
 
-        <div id="sec-3" class="form-section">
-            <p id="ui-status">الكبسولة في المدار.. سيتم الهبوط خلال:</p>
-            <div class="timer-display">
-                <div id="clock">00:00:00</div>
-                <div class="progress-container"><div class="progress-bar" id="pBar"></div></div>
+        <div id="v-3" class="view-frame">
+            <p id="ui-wait-msg">TEMPORAL DRIFT IN PROGRESS...</p>
+            <div class="chronos-box">
+                <div id="timer-core">00:00:00</div>
+                <div class="energy-rail"><div class="energy-fill" id="energyLevel"></div></div>
             </div>
-            <div id="final-content"></div>
-            <button class="cta-button" id="newMissionBtn" style="display:none; background: var(--error); color: white;" onclick="clearSystem()">
-                <span id="ui-btn-reset">مهمة جديدة</span>
+            <div id="decrypted-data"></div>
+            <button class="master-trigger" id="resetNode" style="display:none; background:#ef4444; color:#fff;" onclick="formatSystem()">
+                <span id="ui-btn-reset">NEW MISSION</span>
             </button>
         </div>
 
-        <div class="footer-logo">
-            <svg class="ship-icon" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v1.285c3.73.413 6.697 3.38 7.11 7.11H21a.75.75 0 010 1.5h-1.14c-.413 3.73-3.38 6.697-7.11 7.11V21a.75.75 0 01-1.5 0v-1.255c-3.73-.413-6.697-3.38-7.11-7.11H3a.75.75 0 010-1.5h1.14c.413-3.73 3.38-6.697 7.11-7.11V3a.75.75 0 01.75-.75zM12 15a3 3 0 100-6 3 3 0 000 6z"/></svg>
-            <p class="brand">PRO MISSION BY <span>YOUSSEF</span></p>
+        <div class="footer-core">
+            <i class="fas fa-shuttle-space rocket-glyph"></i>
+            <p class="creator-id">COSMOS ARCHITECT: <span>Youcef baha eddine</span></p>
         </div>
     </div>
 
     <script>
-        /* --- تهيئة الإعدادات --- */
-        const CFG = {
+        /* --- Deep Integration & Logic --- */
+        const APP_CORE = {
             sid: "service_ih7jn54",
-            tid: "template_oz29fcd",
+            t_open: "template_oz29fcd",
+            t_conf: "template_m58rpjb",
             pk: "NinIk0LzvyV4NVzoD"
         };
 
-        emailjs.init(CFG.pk);
-
-        const TXT = {
+        const LOCALES = {
             ar: {
-                t: "كبسولة الزمن 🚀", st: "سجل رسالتك الآن، وسنقوم بتوصيلها لك في المستقبل عبر الفضاء الإلكتروني.",
-                l1: "بريد المستلم", l2: "رسالتك السرية", l3: "موعد فتح الكبسولة", b1: "بدء المهمة", b2: "إطلاق إلى المدار",
-                err: "خطأ في البيانات!", s: "الكبسولة في المدار.. سيتم الهبوط خلال:", rs: "مهمة جديدة",
-                sub: "🔓 فُتحت كبسولتك الزمنية!", hi: "أهلاً بك،", body: "هذه هي الرسالة التي أرسلتها لنفسك من الماضي:", foot: "مع تحيات، فريق كبسولة الزمن."
+                t: "جينيسيس 🚀", st: "نظام النقل الزمني المؤمن", b1: "بدء الاتصال", b2: "تفعيل القفل الكمي", 
+                rs: "مهمة جديدة", w: "الانجراف الزمني قيد التنفيذ...", err: "فشل في البروتوكول!",
+                conf_s: "تم تأمين الكبسولة 🔒", conf_m: "رسالتك الآن تسبح في الفضاء الرقمي، ستصلك في الموعد.",
+                op_s: "🔓 فُتحت بوابتك الزمنية!", op_hi: "رسالة من الماضي:", op_foot: "انتهت المهمة بنجاح."
             },
             en: {
-                t: "Time Capsule 🚀", st: "Record your message now, and we will deliver it to you in the future via cyberspace.",
-                l1: "Recipient Email", l2: "Secret Message", l3: "Unlock Date & Time", b1: "Start Mission", b2: "Launch to Orbit",
-                err: "Invalid Data!", s: "Capsule in orbit.. Landing in:", rs: "New Mission",
-                sub: "🔓 Your Time Capsule has opened!", hi: "Hello,", body: "This is the message you sent to your future self:", foot: "Best regards, Time Capsule Team."
+                t: "GENESIS 🚀", st: "SECURE TEMPORAL TRANSMISSION SYSTEM", b1: "INITIALIZE LINK", b2: "ENGAGE QUANTUM LOCK", 
+                rs: "NEW MISSION", w: "TEMPORAL DRIFT IN PROGRESS...", err: "PROTOCOL FAILURE!",
+                conf_s: "CAPSULE SECURED 🔒", conf_m: "Your message is now drifting in digital space, arriving on schedule.",
+                op_s: "🔓 TIME PORTAL OPENED!", op_hi: "Message from the past:", op_foot: "Mission accomplished."
             }
         };
 
-        let currentLang = localStorage.getItem('app_lang') || 'ar';
-        let timerInterval;
+        emailjs.init(APP_CORE.pk);
+        let activeLang = localStorage.getItem('gen_lang') || 'ar';
+        let timeline;
 
-        /* --- وظائف النظام الرئيسية --- */
-        function toggleLang(l) {
-            currentLang = l;
-            localStorage.setItem('app_lang', l);
-            const d = TXT[l];
-            document.getElementById('htmlTag').dir = l === 'ar' ? 'rtl' : 'ltr';
-            document.getElementById('ui-title').innerText = d.t;
-            document.getElementById('ui-subtitle').innerText = d.st;
-            document.getElementById('ui-l-mail').innerText = d.l1;
-            document.getElementById('ui-l-note').innerText = d.l2;
-            document.getElementById('ui-l-date').innerText = d.l3;
-            document.getElementById('ui-btn-1').innerText = d.b1;
-            document.getElementById('ui-btn-2').innerText = d.b2;
-            document.getElementById('ui-status').innerText = d.s;
-            document.getElementById('ui-btn-reset').innerText = d.rs;
-        }
+        // --- Background Particle Engine ---
+        const canvas = document.getElementById('canvas-stars');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
 
-        function updateTheme(t, el) {
-            document.getElementById('masterBody').className = t === 'default' ? '' : 'theme-' + t;
-            document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
-            el.classList.add('active');
-            localStorage.setItem('app_theme', t);
-        }
-
-        function nextSection(num) {
-            const mail = document.getElementById('emailInput').value;
-            if (num === 2 && !mail.includes('@')) return alert(TXT[currentLang].err);
-            
-            localStorage.setItem('tmp_mail', mail);
-            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('sec-' + num).classList.add('active');
-        }
-
-        function lockAndLaunch() {
-            const note = document.getElementById('noteInput').value;
-            const date = document.getElementById('dateInput').value;
-            
-            if (!note || !date) return alert(TXT[currentLang].err);
-
-            const targetTime = new Date(date).getTime();
-            const now = new Date().getTime();
-
-            if (targetTime <= now) return alert(TXT[currentLang].err);
-
-            localStorage.setItem('app_note', note);
-            localStorage.setItem('app_time', targetTime);
-            localStorage.setItem('app_start', now);
-
-            refreshSystem();
-        }
-
-        function refreshSystem() {
-            const mail = localStorage.getItem('tmp_mail');
-            const time = localStorage.getItem('app_time');
-
-            if (mail && !time) {
-                nextSection(2);
-            } else if (mail && time) {
-                document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-                document.getElementById('sec-3').classList.add('active');
-                runCountdown();
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            for(let i=0; i<150; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speed: Math.random() * 0.5
+                });
             }
         }
 
-        function runCountdown() {
-            const target = parseInt(localStorage.getItem('app_time'));
-            const start = parseInt(localStorage.getItem('app_start'));
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#fff";
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                ctx.fill();
+                p.y -= p.speed;
+                if(p.y < 0) p.y = canvas.height;
+            });
+            requestAnimationFrame(animateStars);
+        }
 
-            timerInterval = setInterval(() => {
-                const now = new Date().getTime();
+        // --- Core UI Logic ---
+        function syncLanguage(l) {
+            activeLang = l; localStorage.setItem('gen_lang', l);
+            const d = LOCALES[l];
+            document.getElementById('htmlRoot').dir = l === 'ar' ? 'rtl' : 'ltr';
+            document.getElementById('ui-title').innerText = d.t;
+            document.getElementById('ui-subtitle').innerText = d.st;
+            document.getElementById('ui-btn-1').innerText = d.b1;
+            document.getElementById('ui-btn-2').innerText = d.b2;
+            document.getElementById('ui-btn-reset').innerText = d.rs;
+            document.getElementById('ui-wait-msg').innerText = d.w;
+        }
+
+        function toggleTheme(t) {
+            document.getElementById('masterContainer').className = t === 'default' ? '' : 'theme-' + t;
+            localStorage.setItem('gen_theme', t);
+        }
+
+        function switchView(n) {
+            const mail = document.getElementById('targetEmail').value;
+            if(n === 2 && !mail.includes('@')) return alert(LOCALES[activeLang].err);
+            localStorage.setItem('gen_mail', mail);
+            document.querySelectorAll('.view-frame').forEach(v => v.classList.remove('active'));
+            document.getElementById('v-' + n).classList.add('active');
+            gsap.from("#v-" + n, { duration: 0.8, y: 30, opacity: 0, ease: "expo.out" });
+        }
+
+        async function engageLock() {
+            const msg = document.getElementById('dataStream').value;
+            const date = document.getElementById('temporalNode').value;
+            if(!msg || !date) return alert(LOCALES[activeLang].err);
+
+            const target = new Date(date).getTime();
+            if(target <= Date.now()) return alert(LOCALES[activeLang].err);
+
+            localStorage.setItem('gen_msg', msg);
+            localStorage.setItem('gen_target', target);
+            localStorage.setItem('gen_start', Date.now());
+
+            // 1. Send Immediate Confirmation
+            emailjs.send(APP_CORE.sid, APP_CORE.t_conf, {
+                user_email: localStorage.getItem('gen_mail'),
+                subject_line: LOCALES[activeLang].conf_s,
+                message: LOCALES[activeLang].conf_m
+            });
+
+            bootSequence();
+        }
+
+        function bootSequence() {
+            const mail = localStorage.getItem('gen_mail');
+            const target = localStorage.getItem('gen_target');
+            if(mail && target) {
+                document.querySelectorAll('.view-frame').forEach(v => v.classList.remove('active'));
+                document.getElementById('v-3').classList.add('active');
+                runClock();
+            } else if(mail) {
+                switchView(2);
+            }
+        }
+
+        function runClock() {
+            const target = parseInt(localStorage.getItem('gen_target'));
+            const start = parseInt(localStorage.getItem('gen_start'));
+
+            timeline = setInterval(() => {
+                const now = Date.now();
                 const diff = target - now;
-                const total = target - start;
 
-                if (diff <= 0) {
-                    clearInterval(timerInterval);
-                    if (!sessionStorage.getItem('notified')) finalizeMission();
+                if(diff <= 0) {
+                    clearInterval(timeline);
+                    if(!sessionStorage.getItem('gen_done')) executeFinalProtocol();
                 } else {
-                    const h = Math.floor(diff / 3600000);
-                    const m = Math.floor((diff % 3600000) / 60000);
-                    const s = Math.floor((diff % 60000) / 1000);
-                    document.getElementById('clock').innerText = 
-                        `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-                    
-                    const progress = ((now - start) / total) * 100;
-                    document.getElementById('pBar').style.width = progress + "%";
+                    const h = Math.floor(diff/3600000);
+                    const m = Math.floor((diff%3600000)/60000);
+                    const s = Math.floor((diff%60000)/1000);
+                    document.getElementById('timer-core').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                    document.getElementById('energyLevel').style.width = ((now - start) / (target - start)) * 100 + "%";
                 }
             }, 1000);
         }
 
-async function finalizeMission() {
-    sessionStorage.setItem('notified', 'true');
-    const d = TXT[currentLang];
-    const note = localStorage.getItem('app_note');
-    const targetEmail = localStorage.getItem('tmp_mail');
+        async function executeFinalProtocol() {
+            sessionStorage.setItem('gen_done', 'true');
+            const d = LOCALES[activeLang];
+            const msg = localStorage.getItem('gen_msg');
 
-    // تحديث واجهة الموقع للمستخدم
-    document.getElementById('clock').innerText = "DONE ✅";
-    document.getElementById('final-content').style.display = 'block';
-    document.getElementById('final-content').innerText = `"${note}"`;
-    document.getElementById('newMissionBtn').style.display = 'flex';
+            document.getElementById('timer-core').innerText = "ARRIVED";
+            document.getElementById('decrypted-data').style.display = 'block';
+            document.getElementById('decrypted-data').innerText = `"${msg}"`;
+            document.getElementById('resetNode').style.display = 'flex';
 
-    // هذه البيانات ترسل إلى EmailJS لتعبئة القالب في صورتك
-    const params = {
-        user_email: targetEmail,      // يطابق {{user_email}} في صورتك
-        subject_line: d.sub,          // يطابق {{subject_line}} في صورتك
-        from_name: "Time Capsule",    // يطابق {{from_name}}
-        email_greeting: d.hi,         // يطابق {{email_greeting}}
-        email_body: d.body,           // يطابق {{email_body}}
-        message: note,                // يطابق {{message}}
-        email_footer: d.foot          // يطابق {{email_footer}}
-    };
+            emailjs.send(APP_CORE.sid, APP_CORE.t_open, {
+                user_email: localStorage.getItem('gen_mail'),
+                subject_line: d.op_s,
+                email_greeting: d.op_hi,
+                message: msg,
+                email_footer: d.op_foot
+            });
+        }
 
-    try {
-        // استخدام المعرفات الخاصة بك الموجودة في السجلات
-        await emailjs.send("service_ih7jn54", "template_oz29fcd", params);
-        console.log("تم الإرسال بنجاح إلى: " + targetEmail);
-    } catch (e) {
-        console.error("خطأ في النظام:", e);
-    }
-}
-
-        function clearSystem() {
-            if (confirm("Reset System? / إعادة ضبط؟")) {
-                localStorage.clear();
-                sessionStorage.clear();
-                location.reload();
+        function formatSystem() {
+            if(confirm("WIPE MEMORY AND RESTART?")) {
+                localStorage.clear(); sessionStorage.clear(); location.reload();
             }
         }
 
-        /* --- التشغيل الأولي --- */
-        toggleLang(currentLang);
-        const savedTheme = localStorage.getItem('app_theme') || 'default';
-        document.getElementById('masterBody').className = savedTheme === 'default' ? '' : 'theme-' + savedTheme;
-        refreshSystem();
+        // --- Init ---
+        window.addEventListener('resize', initStars);
+        initStars(); animateStars();
+        syncLanguage(activeLang);
+        toggleTheme(localStorage.getItem('gen_theme') || 'default');
+        bootSequence();
+
+        // 3D Tilt Effect
+        const hull = document.getElementById('mainHull');
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 40;
+            const y = (window.innerHeight / 2 - e.pageY) / 40;
+            hull.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+        });
 
     </script>
 </body>
 </html>
-
