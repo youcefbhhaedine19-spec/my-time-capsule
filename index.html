@@ -61,6 +61,8 @@
             box-shadow: 0 0 80px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05);
             transform-style: preserve-3d;
             transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
+            will-change: transform; /* لتحسين الأداء على الهاتف */
         }
 
         /* --- UI Controls --- */
@@ -457,14 +459,57 @@
         bootSequence();
 
         // 3D Tilt Effect
-        const hull = document.getElementById('mainHull');
-        document.addEventListener('mousemove', (e) => {
-            const x = (window.innerWidth / 2 - e.pageX) / 40;
-            const y = (window.innerHeight / 2 - e.pageY) / 40;
-            hull.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+        /* --- نظام الحركة المدمج (فارة + جيروسكوب) --- */
+
+const hull = document.getElementById('mainHull');
+
+// أولاً: حركة الفارة للكمبيوتر
+document.addEventListener('mousemove', (e) => {
+    if (window.innerWidth > 768) { // يعمل فقط على الشاشات الكبيرة
+        const x = (window.innerWidth / 2 - e.pageX) / 35;
+        const y = (window.innerHeight / 2 - e.pageY) / 35;
+        gsap.to(hull, {
+            duration: 0.5,
+            rotateY: x,
+            rotateX: -y,
+            ease: "power2.out"
         });
+    }
+});
+
+// ثانياً: حركة الجيروسكوب للهاتف
+window.addEventListener('deviceorientation', (e) => {
+    if (window.innerWidth <= 768) { // يعمل فقط على الهواتف
+        // gamma: الميل يميناً ويساراً (من -90 إلى 90)
+        // beta: الميل للأمام والخلف (من -180 إلى 180)
+        let requestX = e.gamma / 1.5; 
+        let requestY = (e.beta - 45) / 1.5; // طرح 45 لأن المستخدم يمسك الهاتف بزاوية عادة
+
+        gsap.to(hull, {
+            duration: 0.8,
+            rotateY: requestX,
+            rotateX: -requestY,
+            ease: "power2.out"
+        });
+    }
+});
+
+/* ملاحظة لمستخدمي iPhone: */
+// متصفح Safari يحتاج إذن للوصول للحساسات
+if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    document.body.addEventListener('click', () => {
+        DeviceOrientationEvent.requestPermission()
+            .then(response => {
+                if (response == 'granted') {
+                    console.log("Gyroscope Access Granted");
+                }
+            })
+            .catch(console.error);
+    }, { once: true });
+}
 
     </script>
 </body>
 </html>
+
 
