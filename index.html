@@ -37,6 +37,22 @@
             padding: 2.5rem; border-radius: 30px; border: 1px solid var(--border);
             width: 90%; max-width: 400px; text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative;
+            <div class="footer-credit">
+            <svg class="footer-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.85 1.85 0 0 0 .2-1y6 6 0 1 0-11.6 4 6.06 6.06 0 0 0-1.6.2"></path>
+                <path d="M2 12h.01"></path>
+                <path d="M22 12h.01"></path>
+                <path d="M12 2v.01"></path>
+                <path d="M12 22v.01"></path>
+                <circle cx="12" cy="12" r="10" stroke-opacity="0.3"></circle>
+            </svg>
+            
+            <p class="dev-name">Developed by <span>Youssef</span></p>
+        </div>
+        ```
+
+ضع هذا الكود، وسيكون لديك لوجو يتحرك بحركة طفو خفيفة، يتوهج، ويغير لونه حسب الثيم الذي يختاره المستخدم!
         }
 
         .toolbar { position: absolute; top: -55px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; }
@@ -66,6 +82,48 @@
 
         #countdown { font-size: 2.8rem; font-weight: bold; margin: 25px 0; color: var(--primary); letter-spacing: 2px; }
         #messageDisplay { display: none; padding: 20px; border: 2px dashed var(--primary); border-radius: 15px; background: rgba(0,0,0,0.3); font-style: italic; font-size: 1.1rem; line-height: 1.6; }
+        /* تنسيقات الفوتر واللوجو */
+.footer-credit {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.footer-credit:hover {
+    opacity: 1; /* يضيء عند تمرير الماوس */
+}
+
+.footer-logo {
+    width: 40px;
+    height: 40px;
+    stroke: var(--primary); /* يأخذ لون الثيم تلقائياً */
+    filter: drop-shadow(0 0 8px var(--primary)); /* توهج */
+    animation: floatLogo 3s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.dev-name {
+    font-size: 0.9rem;
+    color: white;
+    font-weight: 300;
+}
+
+.dev-name span {
+    color: var(--primary);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
     </style>
 </head>
 <body id="bodyTag">
@@ -211,3 +269,4 @@
     </script>
 </body>
 </html>
+
